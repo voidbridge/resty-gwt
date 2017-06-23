@@ -73,6 +73,8 @@
   -->
   <define-property name="restygwt.encodeDecode.useGwtJackson" values="true,false" />
 
+  <define-configuration-property name="restygwt.encodeDecode.locatorClass" is-multi-valued="false" />
+
   <!--
     Default no autodetection for text/*, for backward compatibility.
   -->

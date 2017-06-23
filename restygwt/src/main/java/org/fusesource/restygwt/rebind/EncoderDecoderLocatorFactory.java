@@ -1,18 +1,46 @@
 package org.fusesource.restygwt.rebind;
 
 import com.google.gwt.core.ext.BadPropertyValueException;
+import com.google.gwt.core.ext.ConfigurationProperty;
 import com.google.gwt.core.ext.GeneratorContext;
 import com.google.gwt.core.ext.SelectionProperty;
 import com.google.gwt.core.ext.TreeLogger;
 import com.google.gwt.core.ext.UnableToCompleteException;
 
+import java.lang.reflect.Constructor;
+
 public class EncoderDecoderLocatorFactory {
 
+
+	public static final String LOCATOR_CLASS_PROPERTY_NAME = "restygwt.encodeDecode.locatorClass";
 
 	public static final String USE_GWT_JACKSON_ENCODE_DECODER_PROPERTY_NAME = "restygwt.encodeDecode.useGwtJackson";
 
 	public static EncoderDecoderLocator getEncoderDecoderInstanceLocator(GeneratorContext context,
 			TreeLogger logger) throws UnableToCompleteException {
+		try {
+			ConfigurationProperty prop =
+					context.getPropertyOracle().getConfigurationProperty(LOCATOR_CLASS_PROPERTY_NAME);
+			String locatorClassName = prop.getValues().get(0);
+			if (locatorClassName != null) {
+				logger.log(TreeLogger.Type.INFO, "Using locator class: " + locatorClassName);
+				try {
+					Class<?> locatorClass = Class.forName(locatorClassName);
+					Constructor<?> locatorConstructor =
+							locatorClass.getConstructor(GeneratorContext.class, TreeLogger.class);
+					return (EncoderDecoderLocator) locatorConstructor.newInstance(context, logger);
+				}
+				catch (ClassNotFoundException e) {
+					logger.log(TreeLogger.Type.ERROR, "Locator class not found: " + e.getMessage(), e);
+				}
+				catch (ReflectiveOperationException e) {
+					logger.log(TreeLogger.Type.ERROR, "Error creating instance of locator class [" +
+							locatorClassName + "]", e);
+				}
+			}
+		}
+		catch (BadPropertyValueException e) {
+		}
 		
 		boolean useGwtJacksonDecoder = false;
 		try {
