@@ -114,12 +114,12 @@ public class JsonEncoderDecoderClassCreator extends BaseSourceCreator {
             throw new UnableToCompleteException();
         }
 
-		if (sourceClazz.isEnum() == null && sourceClazz.isAbstract()) {
-            if (typeInfo == null) {
-                getLogger().log(ERROR, "Abstract classes must be annotated with JsonTypeInfo");
-                throw new UnableToCompleteException();
-            }
-        }
+//		if (sourceClazz.isEnum() == null && sourceClazz.isAbstract()) {
+//            if (typeInfo == null) {
+//                getLogger().log(ERROR, "Abstract classes must be annotated with JsonTypeInfo");
+//                throw new UnableToCompleteException();
+//            }
+//        }
         Json jsonAnnotation = getAnnotation(source, Json.class);
         final Style classStyle = jsonAnnotation != null ? jsonAnnotation.style() : Style.DEFAULT;
         final String railsWrapperName = jsonAnnotation != null && jsonAnnotation.name().length() > 0 ? jsonAnnotation.name() : sourceClazz.getName().toLowerCase();
