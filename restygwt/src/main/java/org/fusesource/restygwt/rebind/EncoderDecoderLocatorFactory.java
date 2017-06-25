@@ -23,7 +23,7 @@ public class EncoderDecoderLocatorFactory {
 					context.getPropertyOracle().getConfigurationProperty(LOCATOR_CLASS_PROPERTY_NAME);
 			String locatorClassName = prop.getValues().get(0);
 			if (locatorClassName != null) {
-				logger.log(TreeLogger.Type.INFO, "Using locator class: " + locatorClassName);
+				logger.log(TreeLogger.Type.DEBUG, "Using locator class: " + locatorClassName);
 				try {
 					Class<?> locatorClass = Class.forName(locatorClassName);
 					Constructor<?> locatorConstructor =
