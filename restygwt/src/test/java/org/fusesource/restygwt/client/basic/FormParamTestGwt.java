@@ -22,13 +22,27 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.junit.client.GWTTestCase;
-import org.fusesource.restygwt.client.*;
-import org.fusesource.restygwt.rebind.RestServiceClassCreator;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import java.util.*;
+
+import org.fusesource.restygwt.client.AbstractJsonEncoderDecoder;
+import org.fusesource.restygwt.client.JsonEncoderDecoder;
+import org.fusesource.restygwt.client.Method;
+import org.fusesource.restygwt.client.MethodCallback;
+import org.fusesource.restygwt.client.ObjectEncoderDecoder;
+import org.fusesource.restygwt.client.Resource;
+import org.fusesource.restygwt.client.RestService;
+import org.fusesource.restygwt.client.RestServiceProxy;
+import org.fusesource.restygwt.rebind.RestServiceClassCreator;
 
 /**
  *
@@ -47,7 +61,7 @@ public class FormParamTestGwt extends GWTTestCase {
     }
 
     @Path("/get")
-    static interface FormParamTestRestService extends RestService {
+    interface FormParamTestRestService extends RestService {
 
         @POST
         void get(@FormParam(value = "id") int id, MethodCallback<Echo> callback);
@@ -56,19 +70,24 @@ public class FormParamTestGwt extends GWTTestCase {
         void get(@FormParam(value = "id") Integer id, MethodCallback<Echo> callback);
 
         @POST
-        void twoParams(@FormParam(value = "id") int id, @FormParam(value = "dto") ExampleDto exampleDto, MethodCallback<Echo> callback);
+        void twoParams(@FormParam(value = "id") int id, @FormParam(value = "dto") ExampleDto exampleDto,
+                       MethodCallback<Echo> callback);
 
         @POST
         void listParams(@FormParam(value = "dtoList") List<ExampleDto> exampleDtoList, MethodCallback<Echo> callback);
 
         @POST
-        void listStringParams(@FormParam(value = "stringList") List<String> exampleStringList, MethodCallback<Echo> callback);
+        void listStringParams(@FormParam(value = "stringList") List<String> exampleStringList,
+                              MethodCallback<Echo> callback);
 
         /**
-         * Method to check special handling of package "java.lang." in {@link RestServiceClassCreator#toIteratedFormStringExpression}
+         * Method to check special handling of package "java.lang." in
+         * {@link RestServiceClassCreator#toIteratedFormStringExpression}
          */
         @POST
-        void listStringBuilderParams(@FormParam(value = "stringBuilderList") List<java.lang.StringBuilder> exampleStringBuilderList, MethodCallback<Echo> callback);
+        void listStringBuilderParams(
+                @FormParam(value = "stringBuilderList") List<StringBuilder> exampleStringBuilderList,
+                MethodCallback<Echo> callback);
 
         @POST
         void arrayParams(@FormParam(value = "dtoArray") ExampleDto[] exampleDtoArray, MethodCallback<Echo> callback);
@@ -171,7 +190,7 @@ public class FormParamTestGwt extends GWTTestCase {
 
     public void testPostWithDtoList() {
         final ObjectEncoderDecoder objectEncoderDecoder = new ObjectEncoderDecoder();
-        final List<ExampleDto> dtoList = Collections.singletonList(createDtoObject());
+        List<ExampleDto> dtoList = Collections.singletonList(createDtoObject());
 
         service.listParams(dtoList, new MethodCallback<Echo>() {
             @Override
@@ -184,11 +203,11 @@ public class FormParamTestGwt extends GWTTestCase {
                 assertEquals(1, response.params.size());
 
                 JSONValue jsonDto = JSONParser.parseStrict(response.params.get("dtoList"));
-                final Object decoded_object = objectEncoderDecoder.decode(jsonDto);
+                Object decoded_object = objectEncoderDecoder.decode(jsonDto);
                 if (decoded_object instanceof Collection) {
-                    final Collection<String> decoded_list = (Collection<String>) decoded_object;
-                    final List decoded_elem_list = new ArrayList();
-                    for (final String json_elem : decoded_list) {
+                    Collection<String> decoded_list = (Collection<String>) decoded_object;
+                    List decoded_elem_list = new ArrayList();
+                    for (String json_elem : decoded_list) {
                         decoded_elem_list.add(objectEncoderDecoder.decode(json_elem));
                     }
                     assertEquals(createDtoObjectAsList(), decoded_elem_list);
@@ -216,11 +235,11 @@ public class FormParamTestGwt extends GWTTestCase {
                 assertEquals(1, response.params.size());
 
                 JSONValue jsonValue = AbstractJsonEncoderDecoder.JSON_VALUE.decode(response.params.get("stringList"));
-                final Object decoded_object = objectEncoderDecoder.decode(jsonValue);
+                Object decoded_object = objectEncoderDecoder.decode(jsonValue);
                 if (decoded_object instanceof Collection) {
-                    final Collection<String> decoded_list = (Collection<String>) decoded_object;
-                    final List decoded_elem_list = new ArrayList();
-                    for (final String json_elem : decoded_list) {
+                    Collection<String> decoded_list = (Collection<String>) decoded_object;
+                    List decoded_elem_list = new ArrayList();
+                    for (String json_elem : decoded_list) {
                         decoded_elem_list.add(objectEncoderDecoder.decode(json_elem));
                     }
                     assertEquals(stringList, decoded_elem_list);
@@ -246,8 +265,9 @@ public class FormParamTestGwt extends GWTTestCase {
     }
 
     /**
-     * Test to check special handling of package "java.lang." in {@link RestServiceClassCreator#toIteratedFormStringExpression}
-     * 
+     * Test to check special handling of package "java.lang." in
+     * {@link RestServiceClassCreator#toIteratedFormStringExpression}
+     *
      * @see FormParamTestRestService#listStringBuilderParams(List, MethodCallback)
      */
     public void testPostWithStringBuilderList() {
@@ -264,12 +284,13 @@ public class FormParamTestGwt extends GWTTestCase {
             public void onSuccess(Method method, Echo response) {
                 assertEquals(1, response.params.size());
 
-                JSONValue jsonValue = AbstractJsonEncoderDecoder.JSON_VALUE.decode(response.params.get("stringBuilderList"));
-                final Object decoded_object = objectEncoderDecoder.decode(jsonValue);
+                JSONValue jsonValue =
+                    AbstractJsonEncoderDecoder.JSON_VALUE.decode(response.params.get("stringBuilderList"));
+                Object decoded_object = objectEncoderDecoder.decode(jsonValue);
                 if (decoded_object instanceof Collection) {
-                    final Collection<String> decoded_list = (Collection<String>) decoded_object;
-                    final List decoded_elem_list = new ArrayList();
-                    for (final String json_elem : decoded_list) {
+                    Collection<String> decoded_list = (Collection<String>) decoded_object;
+                    List decoded_elem_list = new ArrayList();
+                    for (String json_elem : decoded_list) {
                         decoded_elem_list.add(objectEncoderDecoder.decode(json_elem));
                     }
                     assertListEquals(stringBuilderList, decoded_elem_list);
@@ -284,7 +305,7 @@ public class FormParamTestGwt extends GWTTestCase {
 
     public void testPostWithDtoArray() {
         final ObjectEncoderDecoder objectEncoderDecoder = new ObjectEncoderDecoder();
-        final ExampleDto[] dtoList = new ExampleDto[] { createDtoObject() };
+        ExampleDto[] dtoList = new ExampleDto[]{createDtoObject()};
 
         service.arrayParams(dtoList, new MethodCallback<Echo>() {
             @Override
@@ -340,24 +361,9 @@ public class FormParamTestGwt extends GWTTestCase {
     private List createDtoObjectAsList() {
         ArrayList result = new ArrayList();
 
-        result.add(
-            map("name", "dtoName",
-                "complexMap1", map(
-                    "1", "one",
-                    "2", "two",
-                    "3", "three"
-                ),
-                "complexMap2", null,
-                "complexMap3", null,
-                "complexMap4", null,
-                "complexMap5", null,
-                "complexMap7", null,
-                "complexMap8", null,
-                "complexMap9", null,
-                "complexMap10", null,
-                "complexMap11", null
-            )
-        );
+        result.add(map("name", "dtoName", "complexMap1", map("1", "one", "2", "two", "3", "three"), "complexMap2", null,
+            "complexMap3", null, "complexMap4", null, "complexMap5", null, "complexMap7", null, "complexMap8", null,
+            "complexMap9", null, "complexMap10", null, "complexMap11", null));
 
         return result;
     }
@@ -373,7 +379,7 @@ public class FormParamTestGwt extends GWTTestCase {
     }
 
     private ExampleDto createDtoObject() {
-        final ExampleDto dto = new ExampleDto();
+        ExampleDto dto = new ExampleDto();
         dto.name = "dtoName";
         dto.complexMap1 = new HashMap<Integer, String>();
         dto.complexMap1.put(1, "one");

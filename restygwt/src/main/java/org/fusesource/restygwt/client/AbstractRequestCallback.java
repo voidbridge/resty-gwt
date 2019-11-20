@@ -18,14 +18,14 @@
 
 package org.fusesource.restygwt.client;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.logging.client.LogConfiguration;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -45,37 +45,41 @@ public abstract class AbstractRequestCallback<T> implements RequestCallback {
     }
 
     @Override
-    final public void onError(Request request, Throwable exception) {
-        this.method.request = request;
-        callback.onFailure(this.method, exception);
+    public final void onError(Request request, Throwable exception) {
+        method.request = request;
+        callback.onFailure(method, exception);
     }
 
     private Logger getLogger() {
-        if (GWT.isClient() && LogConfiguration.loggingIsEnabled() && this.logger == null) {
-            this.logger = Logger.getLogger( AbstractRequestCallback.class.getName() );
+        if (GWT.isClient() && LogConfiguration.loggingIsEnabled() && logger == null) {
+            logger = Logger.getLogger(AbstractRequestCallback.class.getName());
         }
-        return this.logger;
+        return logger;
     }
-    
+
     @Override
-    final public void onResponseReceived(Request request, Response response) {
-        this.method.request = request;
-        this.method.response = response;
+    public final void onResponseReceived(Request request, Response response) {
+        method.request = request;
+        method.response = response;
         if (response == null) {
-            callback.onFailure(this.method,
-                    Defaults.getExceptionMapper().createNoResponseException());
+            callback.onFailure(method, Defaults.getExceptionMapper().createNoResponseException());
         } else if (isFailedStatus(response)) {
-            callback.onFailure(this.method,
-                    Defaults.getExceptionMapper().createFailedStatusException(method, response));
+            callback
+                    .onFailure(method, Defaults.getExceptionMapper().createFailedStatusException(method, response));
         } else {
+            if (getLogger() != null) {
+                getLogger().fine(
+                        "Received http response for request: " + method.builder.getHTTPMethod() + " " +
+                                method.builder.getUrl());
+            }
+            if (Response.SC_NO_CONTENT == response.getStatusCode()) {
+                callback.onSuccess(method, null);
+                return;
+            }
             T value;
-            try { 
-                if ( getLogger() != null ) {
-                    getLogger().fine("Received http response for request: " + this.method.builder.getHTTPMethod()
-                        + " " + this.method.builder.getUrl());
-                }
+            try {
                 String content = response.getText();
-                if (content != null && content.length() > 0) {
+                if (content != null) {
                     if (getLogger() != null) {
                         getLogger().finest(content);
                     }
@@ -84,20 +88,20 @@ public abstract class AbstractRequestCallback<T> implements RequestCallback {
                     value = null;
                 }
             } catch (Throwable e) {
-                if ( getLogger() != null ) {
+                if (getLogger() != null) {
                     getLogger().log(Level.FINE, "Could not parse response: " + e, e);
                 }
-                callback.onFailure(this.method, e);
+                callback.onFailure(method, e);
                 return;
             }
 
-            callback.onSuccess(this.method, value);
+            callback.onSuccess(method, value);
         }
     }
 
     protected boolean isFailedStatus(Response response) {
-        return !this.method.isExpected(response.getStatusCode());
+        return !method.isExpected(response.getStatusCode());
     }
 
-    abstract protected T parseResult() throws Exception;
+    protected abstract T parseResult() throws Exception;
 }

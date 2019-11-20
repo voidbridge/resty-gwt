@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
 
 @Documented
 @Retention(RUNTIME)
-@Target( { METHOD, TYPE })
+@Target({ METHOD, TYPE })
 public @interface ModelChange {
 
     /**
@@ -37,7 +37,7 @@ public @interface ModelChange {
      * what is the key on that ``put`` (and later ``get``) operation, we have this
      * constant here.
      */
-    public static final String MODEL_CHANGED_DOMAIN_KEY = "mc";
+    String MODEL_CHANGED_DOMAIN_KEY = "mc";
 
     /**
      * on which HTTP methods will events be published.
@@ -52,6 +52,5 @@ public @interface ModelChange {
      *
      * @return
      */
-    @SuppressWarnings("rawtypes")
-    Class[] domain() default {};
+    @SuppressWarnings("rawtypes") Class[] domain() default {};
 }

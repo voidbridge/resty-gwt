@@ -1,6 +1,11 @@
 package org.fusesource.restygwt.rebind.util;
 
+import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
+import com.google.gwt.core.ext.typeinfo.HasAnnotations;
+import com.google.gwt.core.ext.typeinfo.JClassType;
+
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -8,10 +13,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
-
-import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
-import com.google.gwt.core.ext.typeinfo.HasAnnotations;
-import com.google.gwt.core.ext.typeinfo.JClassType;
 
 public class AnnotationUtils {
 
@@ -36,7 +37,7 @@ public class AnnotationUtils {
     }
 
     public static <T extends Annotation> T getClassAnnotation(JClassType classType, Class<T> annotationType) {
-        T annotation = null;
+        T annotation;
 
         if (classType == null) {
             return null;
@@ -59,10 +60,11 @@ public class AnnotationUtils {
     /**
      * Get all annotations from superclasses and superinterfaces.<br>
      * <br>
-     * Works like {@link JClassType#findAnnotationInTypeHierarchy(Class)} but returns all annotations in the type hierarchy.
-     * 
+     * Works like {@link JClassType#findAnnotationInTypeHierarchy(Class)} but returns all annotations in the type
+     * hierarchy.
+     *
      * @author Ralf Sommer {@literal <ralf.sommer.dev@gmail.com>}
-     * 
+     *
      * @param classType
      * @return annotations
      */
@@ -82,9 +84,7 @@ public class AnnotationUtils {
 
             // Get the annotations only from current, no inherited
             Annotation[] annotations = current.getDeclaredAnnotations();
-            for (Annotation annotation : annotations) {
-                resultAnnotations.add(annotation);
-            }
+            Collections.addAll(resultAnnotations, annotations);
 
             if (current.getSuperclass() != null) {
                 // Add the superclass to the queue
@@ -98,4 +98,14 @@ public class AnnotationUtils {
         return resultAnnotations.toArray(new Annotation[resultAnnotations.size()]);
     }
 
+    public static Annotation[] findSupportedAnnotations(Annotation[] annotations) {
+        List<Annotation> result = new ArrayList<Annotation>();
+        for (Annotation annotation : annotations) {
+            String name = annotation.annotationType().getCanonicalName();
+            if (name.startsWith("javax.ws.rs") || name.startsWith("org.fusesource.restygwt.client")) {
+                result.add(annotation);
+            }
+        }
+        return result.toArray(new Annotation[]{});
+    }
 }

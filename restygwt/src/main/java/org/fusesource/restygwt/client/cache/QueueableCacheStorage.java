@@ -18,10 +18,10 @@
 
 package org.fusesource.restygwt.client.cache;
 
-import java.util.List;
-
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
+
+import java.util.List;
 
 /**
  * more enhanced cache interface caching Response objects.
@@ -31,11 +31,11 @@ import com.google.gwt.http.client.Response;
  */
 public interface QueueableCacheStorage extends CacheStorage<Response> {
 
-    public static final String RESTY_CACHE_HEADER = "X-Resty-Cache";
+    String RESTY_CACHE_HEADER = "X-Resty-Cache";
 
-    public boolean hasCallback(final CacheKey k);
+    boolean hasCallback(CacheKey k);
 
-    public void addCallback(final CacheKey k, final RequestCallback rc);
+    void addCallback(CacheKey k, RequestCallback rc);
 
-    public List<RequestCallback> removeCallbacks(final CacheKey k);
+    List<RequestCallback> removeCallbacks(CacheKey k);
 }

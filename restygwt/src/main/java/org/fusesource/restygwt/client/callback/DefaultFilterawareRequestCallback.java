@@ -18,19 +18,20 @@
 
 package org.fusesource.restygwt.client.callback;
 
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import org.fusesource.restygwt.client.AbstractNestedRequestCallback;
 import org.fusesource.restygwt.client.Method;
 
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.Response;
-
-public class DefaultFilterawareRequestCallback extends AbstractNestedRequestCallback implements FilterawareRequestCallback {
+public class DefaultFilterawareRequestCallback extends AbstractNestedRequestCallback
+    implements FilterawareRequestCallback {
 
 
-    final protected List<CallbackFilter> callbackFilters = new ArrayList<CallbackFilter>();
+    protected final List<CallbackFilter> callbackFilters = new ArrayList<CallbackFilter>();
 
     public DefaultFilterawareRequestCallback(Method method) {
         // need to keep requestcallback here, as ``method.builder.getCallback()`` does not
@@ -47,7 +48,7 @@ public class DefaultFilterawareRequestCallback extends AbstractNestedRequestCall
     }
 
     @Override
-    protected void doError(Request request, Response response){
+    protected void doError(Request request, Response response) {
         for (CallbackFilter f : callbackFilters) {
             requestCallback = f.filter(method, response, requestCallback);
         }

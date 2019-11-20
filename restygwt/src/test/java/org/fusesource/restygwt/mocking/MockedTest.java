@@ -19,6 +19,8 @@
 package org.fusesource.restygwt.mocking;
 
 import com.google.gwt.http.client.Request;
+import com.google.gwt.junit.GWTMockUtilities;
+
 import junit.framework.TestCase;
 
 import org.fusesource.restygwt.client.Method;
@@ -27,21 +29,21 @@ import org.fusesource.restygwt.client.basic.ExampleDto;
 import org.fusesource.restygwt.client.basic.ExampleService;
 import org.junit.Before;
 
-import com.google.gwt.junit.GWTMockUtilities;
-
 /**
  * Just a real world usability example how services can be mocked in a simple manner.
  * WITHOUT using GwtTestCases that tend to be damn slow.
  *
  * In principle - you just have to implement the interface - right?
  *
- * @author <a href="mailto:mail@raphaelbauer.com">rEyez</<a>
+ * @author <a href="mailto:mail@raphaelbauer.com">rEyez</a>
  *
  */
 public class MockedTest extends TestCase {
 
+    @Override
     @Before
     public void setUp() throws Exception {
+        super.setUp();
         GWTMockUtilities.disarm();
     }
 
@@ -53,8 +55,9 @@ public class MockedTest extends TestCase {
             public void getExampleDto(MethodCallback<ExampleDto> callback) {
                 ExampleDto exampleDto = new ExampleDto();
                 exampleDto.name = "name";
-               callback.onSuccess(null, exampleDto);
+                callback.onSuccess(null, exampleDto);
             }
+
             @Override
             public Request getExampleDtoCancelable(MethodCallback<ExampleDto> callback) {
                 ExampleDto exampleDto = new ExampleDto();
@@ -62,6 +65,7 @@ public class MockedTest extends TestCase {
                 callback.onSuccess(null, exampleDto);
                 return null;
             }
+
             @Override
             public void storeDto(ExampleDto exampleDto, MethodCallback<Void> callback) {
                 callback.onSuccess(null, null);

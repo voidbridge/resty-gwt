@@ -21,28 +21,28 @@ package org.fusesource.restygwt.client;
 import com.google.gwt.json.client.JSONValue;
 
 /**
- * 
+ *
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
 public interface JsonEncoderDecoder<T> {
 
     @SuppressWarnings("serial")
-    public static class EncodingException extends RuntimeException {
+    class EncodingException extends RuntimeException {
         public EncodingException(String msg) {
             super(msg);
         }
     }
 
     @SuppressWarnings("serial")
-    public static class DecodingException extends RuntimeException {
+    class DecodingException extends RuntimeException {
         public DecodingException(String msg) {
             super(msg);
         }
     }
 
-    public JSONValue encode(T value) throws EncodingException;
+    JSONValue encode(T value) throws EncodingException;
 
-    public T decode(JSONValue value) throws DecodingException;
+    T decode(JSONValue value) throws DecodingException;
 
-    public T decode(String value) throws DecodingException;
+    T decode(String value) throws DecodingException;
 }

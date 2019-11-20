@@ -18,14 +18,17 @@
 
 package org.fusesource.restygwt.client.basic;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.junit.client.GWTTestCase;
+
 import org.fusesource.restygwt.client.Defaults;
 import org.fusesource.restygwt.client.Dispatcher;
 import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.MethodCallback;
 import org.fusesource.restygwt.client.Resource;
 import org.fusesource.restygwt.client.RestServiceProxy;
-import org.fusesource.restygwt.client.cache.VolatileQueueableCacheStorage;
 import org.fusesource.restygwt.client.cache.QueueableCacheStorage;
+import org.fusesource.restygwt.client.cache.VolatileQueueableCacheStorage;
 import org.fusesource.restygwt.client.callback.CachingCallbackFilter;
 import org.fusesource.restygwt.client.callback.CallbackFactory;
 import org.fusesource.restygwt.client.callback.CallbackFilter;
@@ -34,14 +37,11 @@ import org.fusesource.restygwt.client.dispatcher.CachingDispatcherFilter;
 import org.fusesource.restygwt.client.dispatcher.DefaultFilterawareDispatcher;
 import org.fusesource.restygwt.client.dispatcher.DispatcherFilter;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.junit.client.GWTTestCase;
-
 /**
  * check a server sided failure response will not cause the failure call immediately.
  * instead the test proves there will be 2 retries, where the second one succeeds.
  *
- * @author <a href="mailto:mail@raphaelbauer.com">rEyez</<a>
+ * @author <a href="mailto:mail@raphaelbauer.com">rEyez</a>
  */
 public class FailingTestGwt extends GWTTestCase {
 
@@ -87,14 +87,13 @@ public class FailingTestGwt extends GWTTestCase {
          * configure RESTY to use cache, usually done in gin
          */
         QueueableCacheStorage cache = new VolatileQueueableCacheStorage();
-        
+
         CallbackFilter cachingCallbackFilter = new CachingCallbackFilter(cache);
-        CallbackFactory callbackFactory = new RetryingCallbackFactory(
-                100,// grace period millis
-                4,// number of retries
-                cachingCallbackFilter);
+        CallbackFactory callbackFactory = new RetryingCallbackFactory(100,// grace period millis
+            4,// number of retries
+            cachingCallbackFilter);
         DispatcherFilter cachingDispatcherFilter = new CachingDispatcherFilter(cache, callbackFactory);
-        
+
         Dispatcher dispatcher = new DefaultFilterawareDispatcher(cachingDispatcherFilter);
 
         Defaults.setDispatcher(dispatcher);

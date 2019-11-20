@@ -15,14 +15,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.fusesource.restygwt.rebind;
-
-import java.lang.annotation.Annotation;
-
-import org.fusesource.restygwt.client.RestService;
-import org.fusesource.restygwt.rebind.util.AnnotationCopyUtil;
-import org.fusesource.restygwt.rebind.util.AnnotationUtils;
-import org.fusesource.restygwt.rebind.util.OnceFirstIterator;
 
 import com.google.gwt.core.ext.GeneratorContext;
 import com.google.gwt.core.ext.TreeLogger;
@@ -32,6 +26,13 @@ import com.google.gwt.core.ext.typeinfo.JMethod;
 import com.google.gwt.core.ext.typeinfo.JParameter;
 import com.google.gwt.core.ext.typeinfo.JPrimitiveType;
 import com.google.gwt.user.rebind.ClassSourceFileComposerFactory;
+
+import java.lang.annotation.Annotation;
+
+import org.fusesource.restygwt.client.RestService;
+import org.fusesource.restygwt.rebind.util.AnnotationCopyUtil;
+import org.fusesource.restygwt.rebind.util.AnnotationUtils;
+import org.fusesource.restygwt.rebind.util.OnceFirstIterator;
 
 /**
  * @author <a href="mailto:bogdan.mustiata@gmail.com">Bogdan Mustiata</a>
@@ -46,12 +47,8 @@ public class DirectRestServiceInterfaceClassCreator extends DirectRestBaseSource
     @Override
     protected ClassSourceFileComposerFactory createComposerFactory() throws UnableToCompleteException {
         Annotation[] annotations = AnnotationUtils.getAnnotationsInTypeHierarchy(source);
-        return createClassSourceComposerFactory(JavaSourceCategory.INTERFACE,
-                getAnnotationsAsStringArray(annotations),
-                new String[]{
-                        RestService.class.getCanonicalName()
-                }
-        );
+        return createClassSourceComposerFactory(JavaSourceCategory.INTERFACE, getAnnotationsAsStringArray(annotations),
+            new String[] { RestService.class.getCanonicalName() });
     }
 
     @Override
@@ -59,7 +56,8 @@ public class DirectRestServiceInterfaceClassCreator extends DirectRestBaseSource
         super.generate();
 
         for (JMethod method : source.getInheritableMethods()) {
-            p(getAnnotationsAsString(method.getAnnotations()));
+            Annotation[] supportedAnnotations = AnnotationUtils.findSupportedAnnotations(method.getAnnotations());
+            p(getAnnotationsAsString(supportedAnnotations));
             p("void " + method.getName() + "(" + getMethodParameters(method) + getMethodCallback(method) + ");");
         }
     }
@@ -68,12 +66,10 @@ public class DirectRestServiceInterfaceClassCreator extends DirectRestBaseSource
         StringBuilder result = new StringBuilder("");
 
         for (JParameter parameter : method.getParameters()) {
-            result.append(getAnnotationsAsString(parameter.getAnnotations()))
-                    .append(" ")
-                    .append(parameter.getType().getParameterizedQualifiedSourceName())
-                    .append(" ")
-                    .append(parameter.getName())
-                    .append(", ");
+            Annotation[] supportedAnnotations = AnnotationUtils.findSupportedAnnotations(parameter.getAnnotations());
+            result.append(getAnnotationsAsString(supportedAnnotations)).append(" ")
+                .append(parameter.getType().getParameterizedQualifiedSourceName()).append(" ")
+                .append(parameter.getName()).append(", ");
         }
 
         return result.toString();
@@ -82,9 +78,10 @@ public class DirectRestServiceInterfaceClassCreator extends DirectRestBaseSource
     private String getMethodCallback(JMethod method) {
         if (method.getReturnType().isPrimitive() != null) {
             JPrimitiveType primitiveType = method.getReturnType().isPrimitive();
-            return "org.fusesource.restygwt.client.MethodCallback<" + primitiveType.getQualifiedBoxedSourceName() + "> callback";
+            return "org.fusesource.restygwt.client.MethodCallback<" + primitiveType.getQualifiedBoxedSourceName() +
+                "> callback";
         }
-        final String returnType = method.getReturnType().getParameterizedQualifiedSourceName();
+        String returnType = method.getReturnType().getParameterizedQualifiedSourceName();
         if (isOverlayMethod(method)) {
             return "org.fusesource.restygwt.client.OverlayCallback<" + returnType + "> callback";
         }

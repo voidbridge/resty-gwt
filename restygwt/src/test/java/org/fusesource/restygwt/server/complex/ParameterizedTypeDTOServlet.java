@@ -18,6 +18,8 @@
 
 package org.fusesource.restygwt.server.complex;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -27,64 +29,54 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.fusesource.restygwt.client.basic.ParameterizedTypeDTO.DTO;
 import org.fusesource.restygwt.client.basic.ParameterizedTypeDTO.Thing;
 
 @SuppressWarnings("serial")
-public class ParameterizedTypeDTOServlet
-{
-	public static abstract class JacksonServlet extends HttpServlet
-	{
-		@Override
-		protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
-		{
-			Object o = getThing();
-			resp.setContentType("application/json");
-			new ObjectMapper().writeValue(resp.getOutputStream(), o);
-		}
+public class ParameterizedTypeDTOServlet {
+    public abstract static class JacksonServlet extends HttpServlet {
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            Object o = getThing();
+            resp.setContentType("application/json");
+            new ObjectMapper().writeValue(resp.getOutputStream(), o);
+        }
 
-		protected abstract Object getThing();
-	}
+        protected abstract Object getThing();
+    }
 
-	public static class IntServlet extends JacksonServlet
-	{
-		@Override
-		protected DTO<Integer> getThing()
-		{
-			DTO<Integer> dto = new DTO<Integer>();
-			dto.size = 12;
-			dto.value = 123456;
-			return dto;
-		}
+    public static class IntServlet extends JacksonServlet {
+        @Override
+        protected DTO<Integer> getThing() {
+            DTO<Integer> dto = new DTO<Integer>();
+            dto.size = 12;
+            dto.value = 123456;
+            return dto;
+        }
 
-	}
+    }
 
-	public static class ThingServlet extends JacksonServlet
-	{
-		@Override
-		protected DTO<Thing> getThing()
-		{
-			DTO<Thing> dto = new DTO<Thing>();
-			dto.size = 12;
-			Thing thing = new Thing();
-			thing.name = "Fred Flintstone";
-			dto.value = thing;
-			return dto;
-		}
-	}
+    public static class ThingServlet extends JacksonServlet {
+        @Override
+        protected DTO<Thing> getThing() {
+            DTO<Thing> dto = new DTO<Thing>();
+            dto.size = 12;
+            Thing thing = new Thing();
+            thing.name = "Fred Flintstone";
+            dto.value = thing;
+            return dto;
+        }
+    }
 
-	public static class ThingListServlet extends JacksonServlet
-	{
-		@Override
-		protected DTO<List<Thing>> getThing()
-		{
-			DTO<List<Thing>> dto = new DTO<List<Thing>>();
-			dto.size = 12;
-			Thing thing = new Thing();
-			thing.name = "Fred Flintstone";
-			dto.value = Arrays.asList(thing);
-			return dto;
-		}
-	}
+    public static class ThingListServlet extends JacksonServlet {
+        @Override
+        protected DTO<List<Thing>> getThing() {
+            DTO<List<Thing>> dto = new DTO<List<Thing>>();
+            dto.size = 12;
+            Thing thing = new Thing();
+            thing.name = "Fred Flintstone";
+            dto.value = Arrays.asList(thing);
+            return dto;
+        }
+    }
 }

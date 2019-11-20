@@ -18,64 +18,57 @@
 
 package org.fusesource.restygwt.server.complex;
 
-import org.fusesource.restygwt.client.complex.JsonTypeIdResolver.DTOImplementation;
-
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.fasterxml.jackson.databind.DatabindContext;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.jsontype.TypeIdResolver;
 import com.fasterxml.jackson.databind.type.SimpleType;
 
-public class InterfaceAndImplementationTypeResolver implements TypeIdResolver
-{
-	@Override
-	public void init(JavaType baseType)
-	{
-	}
+import java.io.IOException;
 
-	@Override
-	public String idFromValueAndType(Object value, Class<?> suggestedType)
-	{
-		return idFromValue(value);
-	}
+import org.fusesource.restygwt.client.complex.JsonTypeIdResolver.DTOImplementation;
 
-	@Override
-	public String idFromValue(Object value)
-	{
-		if (value instanceof DTOImplementation)
-			return "implementation";
-		else
-			throw new IllegalArgumentException("Unknown type: " + value);
-	}
-	
-	@Override
-	public String idFromBaseType()
-	{
-		throw new AssertionError();
-	}
-
-	@Override
-	public JavaType typeFromId(String id)
-	{
-		if("implementation".equals(id))
-			return SimpleType.construct(DTOImplementation.class);
-		else
-			throw new IllegalArgumentException("Unknown id: " + id);
-	}
-
-	@Override
-	public Id getMechanism()
-	{
-		return Id.NAME;
-	}
+public class InterfaceAndImplementationTypeResolver implements TypeIdResolver {
+    @Override
+    public void init(JavaType baseType) {
+    }
 
     @Override
-    public JavaType typeFromId(DatabindContext context, String id) {
-        return typeFromId(id);
+    public String idFromValueAndType(Object value, Class<?> suggestedType) {
+        return idFromValue(value);
+    }
+
+    @Override
+    public String idFromValue(Object value) {
+        if (value instanceof DTOImplementation) {
+            return "implementation";
+        } else {
+            throw new IllegalArgumentException("Unknown type: " + value);
+        }
+    }
+
+    @Override
+    public String idFromBaseType() {
+        throw new AssertionError();
+    }
+
+    @Override
+    public Id getMechanism() {
+        return Id.NAME;
+    }
+
+    @Override
+    public JavaType typeFromId(DatabindContext context, String id) throws IOException {
+        if ("implementation".equals(id)) {
+            return SimpleType.construct(DTOImplementation.class);
+        } else {
+            throw new IllegalArgumentException("Unknown id: " + id);
+        }
     }
 
     //@Override
+    @Override
     public String getDescForKnownTypeIds() {
-	return null;
+        return null;
     }
 }

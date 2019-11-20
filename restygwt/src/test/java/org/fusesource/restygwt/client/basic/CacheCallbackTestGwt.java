@@ -18,27 +18,27 @@
 
 package org.fusesource.restygwt.client.basic;
 
-import org.fusesource.restygwt.client.Defaults;
-import org.fusesource.restygwt.client.Method;
-import org.fusesource.restygwt.client.MethodCallback;
-import org.fusesource.restygwt.client.Resource;
-import org.fusesource.restygwt.client.RestServiceProxy;
-import org.fusesource.restygwt.client.cache.VolatileQueueableCacheStorage;
-import org.fusesource.restygwt.client.cache.QueueableCacheStorage;
-import org.fusesource.restygwt.client.callback.CachingCallbackFilter;
-import org.fusesource.restygwt.client.callback.CallbackFactory;
-import org.fusesource.restygwt.client.callback.FilterawareRequestCallback;
-import org.fusesource.restygwt.client.callback.DefaultFilterawareRequestCallback;
-import org.fusesource.restygwt.client.callback.ModelChangeCallbackFilter;
-import org.fusesource.restygwt.client.dispatcher.CachingDispatcherFilter;
-import org.fusesource.restygwt.client.dispatcher.FilterawareDispatcher;
-import org.fusesource.restygwt.client.dispatcher.DefaultFilterawareDispatcher;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.SimpleEventBus;
 import com.google.gwt.junit.client.GWTTestCase;
 import com.google.gwt.user.client.Timer;
+
+import org.fusesource.restygwt.client.Defaults;
+import org.fusesource.restygwt.client.Method;
+import org.fusesource.restygwt.client.MethodCallback;
+import org.fusesource.restygwt.client.Resource;
+import org.fusesource.restygwt.client.RestServiceProxy;
+import org.fusesource.restygwt.client.cache.QueueableCacheStorage;
+import org.fusesource.restygwt.client.cache.VolatileQueueableCacheStorage;
+import org.fusesource.restygwt.client.callback.CachingCallbackFilter;
+import org.fusesource.restygwt.client.callback.CallbackFactory;
+import org.fusesource.restygwt.client.callback.DefaultFilterawareRequestCallback;
+import org.fusesource.restygwt.client.callback.FilterawareRequestCallback;
+import org.fusesource.restygwt.client.callback.ModelChangeCallbackFilter;
+import org.fusesource.restygwt.client.dispatcher.CachingDispatcherFilter;
+import org.fusesource.restygwt.client.dispatcher.DefaultFilterawareDispatcher;
+import org.fusesource.restygwt.client.dispatcher.FilterawareDispatcher;
 
 /**
  * test to check if {@link CachingCallbackFilter} {@link QueueableCacheStorage}
@@ -135,6 +135,7 @@ public class CacheCallbackTestGwt extends GWTTestCase {
         // wait a second for callback to be back for sure
         // usually there should be something like Thread.sleep, but thats not possible here
         new Timer() {
+            @Override
             public void run() {
                 /*
                  * two calls that are handled directly by the cache
@@ -156,6 +157,7 @@ public class CacheCallbackTestGwt extends GWTTestCase {
 
         // this is the third one, started in 3 seconds
         new Timer() {
+            @Override
             public void run() {
                 service.cachingCall(0, new MethodCallback<Void>() {
                     @Override
@@ -222,20 +224,18 @@ public class CacheCallbackTestGwt extends GWTTestCase {
          */
         final EventBus eventBus = new SimpleEventBus();
         final QueueableCacheStorage cacheStorage = new VolatileQueueableCacheStorage();
-        final FilterawareDispatcher dispatcher = new DefaultFilterawareDispatcher();
+        FilterawareDispatcher dispatcher = new DefaultFilterawareDispatcher();
 
-        dispatcher.addFilter(new CachingDispatcherFilter(
-                cacheStorage,
-                new CallbackFactory() {
-                    public FilterawareRequestCallback createCallback(Method method) {
-                        final FilterawareRequestCallback retryingCallback = new DefaultFilterawareRequestCallback(
-                                method);
+        dispatcher.addFilter(new CachingDispatcherFilter(cacheStorage, new CallbackFactory() {
+            @Override
+            public FilterawareRequestCallback createCallback(Method method) {
+                FilterawareRequestCallback retryingCallback = new DefaultFilterawareRequestCallback(method);
 
-                        retryingCallback.addFilter(new CachingCallbackFilter(cacheStorage));
-                        retryingCallback.addFilter(new ModelChangeCallbackFilter(eventBus));
-                        return retryingCallback;
-                    }
-                }));
+                retryingCallback.addFilter(new CachingCallbackFilter(cacheStorage));
+                retryingCallback.addFilter(new ModelChangeCallbackFilter(eventBus));
+                return retryingCallback;
+            }
+        }));
 
         Defaults.setDispatcher(dispatcher);
 

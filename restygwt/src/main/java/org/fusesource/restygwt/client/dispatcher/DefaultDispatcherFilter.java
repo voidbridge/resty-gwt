@@ -18,15 +18,15 @@
 
 package org.fusesource.restygwt.client.dispatcher;
 
+import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.logging.client.LogConfiguration;
+
 import java.util.logging.Logger;
 
 import org.fusesource.restygwt.client.Dispatcher;
 import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.callback.CallbackFactory;
 import org.fusesource.restygwt.client.callback.FilterawareRequestCallback;
-
-import com.google.gwt.http.client.RequestBuilder;
-import com.google.gwt.logging.client.LogConfiguration;
 
 public class DefaultDispatcherFilter implements DispatcherFilter {
 
@@ -40,8 +40,8 @@ public class DefaultDispatcherFilter implements DispatcherFilter {
      * the one and only constructor
      * @param cf
      */
-    public DefaultDispatcherFilter(final CallbackFactory cf) {
-        this.callbackFactory = cf;
+    public DefaultDispatcherFilter(CallbackFactory cf) {
+        callbackFactory = cf;
     }
 
     /**
@@ -50,11 +50,10 @@ public class DefaultDispatcherFilter implements DispatcherFilter {
      * @return continue filtering or not
      */
     @Override
-    public boolean filter(final Method method, final RequestBuilder builder) {
+    public boolean filter(Method method, RequestBuilder builder) {
         if (LogConfiguration.loggingIsEnabled()) {
-            Logger.getLogger(Dispatcher.class.getName()).info(
-                    "Sending http request: " + builder.getHTTPMethod() + " "
-                            + builder.getUrl());
+            Logger.getLogger(Dispatcher.class.getName())
+                .info("Sending http request: " + builder.getHTTPMethod() + " " + builder.getUrl());
         }
 
         builder.setCallback(callbackFactory.createCallback(method));

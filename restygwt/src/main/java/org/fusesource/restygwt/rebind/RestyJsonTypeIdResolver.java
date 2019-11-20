@@ -18,11 +18,12 @@
 
 package org.fusesource.restygwt.rebind;
 
-import java.util.Map;
-
 import com.fasterxml.jackson.databind.jsontype.TypeIdResolver;
 
+import java.util.Map;
+
 public interface RestyJsonTypeIdResolver {
-    public Class<? extends TypeIdResolver> getTypeIdResolverClass();
-    public Map<String, Class<?>> getIdClassMap();
+    Class<? extends TypeIdResolver> getTypeIdResolverClass();
+
+    Map<String, Class<?>> getIdClassMap();
 }

@@ -1,28 +1,29 @@
 package org.fusesource.restygwt.rebind;
 
-import java.lang.annotation.Annotation;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.google.gwt.core.ext.typeinfo.JClassType;
 import com.google.gwt.core.ext.typeinfo.JEnumConstant;
 import com.google.gwt.core.ext.typeinfo.JField;
 import com.google.gwt.core.ext.typeinfo.JMethod;
 import com.google.gwt.core.ext.typeinfo.JType;
 
+import java.lang.annotation.Annotation;
+import java.util.HashMap;
+import java.util.Map;
+
 class DummyJField implements JField {
 
     private final JType type;
     private final String name;
     private final JMethod getterMethod;
-    private Map<Class<? extends Annotation>, Annotation> annotations = new HashMap<Class<? extends Annotation>, Annotation>();
-    
-    DummyJField( String name, JType type, JMethod getterMethod){
+    private Map<Class<? extends Annotation>, Annotation> annotations =
+        new HashMap<Class<? extends Annotation>, Annotation>();
+
+    DummyJField(String name, JType type, JMethod getterMethod) {
         this.name = name;
         this.type = type;
         this.getterMethod = getterMethod;
     }
-    
+
     @SuppressWarnings("unchecked")
     @Override
     public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
@@ -115,12 +116,11 @@ class DummyJField implements JField {
     }
 
     public <T extends Annotation> void setAnnotation(T annotation) {
-        annotations.put( annotation.annotationType(), annotation ); 
+        annotations.put(annotation.annotationType(), annotation);
     }
 
-    public JMethod getGetterMethod()
-    {
+    public JMethod getGetterMethod() {
         return getterMethod;
     }
-    
+
 }

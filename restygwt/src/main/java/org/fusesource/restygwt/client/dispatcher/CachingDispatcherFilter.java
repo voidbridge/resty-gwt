@@ -18,22 +18,22 @@
 
 package org.fusesource.restygwt.client.dispatcher;
 
-import java.util.logging.Logger;
-
-import org.fusesource.restygwt.client.Dispatcher;
-import org.fusesource.restygwt.client.Method;
-import org.fusesource.restygwt.client.cache.CacheKey;
-import org.fusesource.restygwt.client.cache.QueueableCacheStorage;
-import org.fusesource.restygwt.client.cache.ComplexCacheKey;
-import org.fusesource.restygwt.client.callback.CallbackFactory;
-import org.fusesource.restygwt.client.callback.FilterawareRequestCallback;
-
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.logging.client.LogConfiguration;
+
+import java.util.logging.Logger;
+
+import org.fusesource.restygwt.client.Dispatcher;
+import org.fusesource.restygwt.client.Method;
+import org.fusesource.restygwt.client.cache.CacheKey;
+import org.fusesource.restygwt.client.cache.ComplexCacheKey;
+import org.fusesource.restygwt.client.cache.QueueableCacheStorage;
+import org.fusesource.restygwt.client.callback.CallbackFactory;
+import org.fusesource.restygwt.client.callback.FilterawareRequestCallback;
 
 public class CachingDispatcherFilter implements DispatcherFilter {
 
@@ -53,15 +53,13 @@ public class CachingDispatcherFilter implements DispatcherFilter {
      * @param cacheStorage
      * @param cf
      */
-    public CachingDispatcherFilter(final QueueableCacheStorage cacheStorage,
-            final CallbackFactory cf) {
+    public CachingDispatcherFilter(QueueableCacheStorage cacheStorage, CallbackFactory cf) {
         this.cacheStorage = cacheStorage;
-        this.callbackFactory = cf;
+        callbackFactory = cf;
     }
-    
+
     protected CacheKey cacheKey(RequestBuilder builder) {
-        if (RequestBuilder.GET.toString().equalsIgnoreCase(
-                builder.getHTTPMethod())) {
+        if (RequestBuilder.GET.toString().equalsIgnoreCase(builder.getHTTPMethod())) {
             return new ComplexCacheKey(builder);
         }
         return null;
@@ -73,8 +71,8 @@ public class CachingDispatcherFilter implements DispatcherFilter {
      * @return continue filtering or not
      */
     @Override
-    public boolean filter(final Method method, final RequestBuilder builder) {
-        final CacheKey cacheKey = cacheKey(builder);
+    public boolean filter(Method method, final RequestBuilder builder) {
+        CacheKey cacheKey = cacheKey(builder);
 
         if (cacheKey != null) {
             final Response cachedResponse = cacheStorage.getResultOrReturnNull(cacheKey);
@@ -82,13 +80,12 @@ public class CachingDispatcherFilter implements DispatcherFilter {
                 //case 1: we got a result in cache => return it...
                 if (LogConfiguration.loggingIsEnabled()) {
                     Logger.getLogger(Dispatcher.class.getName())
-                            .info("already got a cached response for: " + builder.getHTTPMethod() + " "
-                            + builder.getUrl());
+                        .info("already got a cached response for: " + builder.getHTTPMethod() + " " + builder.getUrl());
                 }
                 // onResponseReceived can be time consuming and can manipulate the DOM
                 // deferring the command keeps the async behaviour of this method call
                 Scheduler.get().scheduleDeferred(new ScheduledCommand() {
-                    
+
                     @Override
                     public void execute() {
                         builder.getCallback().onResponseReceived(null, cachedResponse);
@@ -96,7 +93,7 @@ public class CachingDispatcherFilter implements DispatcherFilter {
                 });
                 return false;
             }
-            final RequestCallback callback = callbackFactory.createCallback(method);
+            RequestCallback callback = callbackFactory.createCallback(method);
 
             //case 2: => no cache in result => queue it....
             if (!cacheStorage.hasCallback(cacheKey)) {
@@ -105,8 +102,7 @@ public class CachingDispatcherFilter implements DispatcherFilter {
 
                 if (LogConfiguration.loggingIsEnabled()) {
                     Logger.getLogger(Dispatcher.class.getName())
-                            .info("Sending *caching* http request: " + builder.getHTTPMethod() + " "
-                            + builder.getUrl());
+                        .info("Sending *caching* http request: " + builder.getHTTPMethod() + " " + builder.getUrl());
                 }
 
                 // important part:
@@ -116,8 +112,7 @@ public class CachingDispatcherFilter implements DispatcherFilter {
             //case 2.2 => a callback already in progress => queue to get response when back
             if (LogConfiguration.loggingIsEnabled()) {
                 Logger.getLogger(Dispatcher.class.getName())
-                        .info("request in progress, queue callback: " + builder.getHTTPMethod() + " "
-                        + builder.getUrl());
+                    .info("request in progress, queue callback: " + builder.getHTTPMethod() + " " + builder.getUrl());
             }
             cacheStorage.addCallback(cacheKey, callback);
             return false;
@@ -125,15 +120,15 @@ public class CachingDispatcherFilter implements DispatcherFilter {
         // non cachable case
         if (LogConfiguration.loggingIsEnabled()) {
             String content = builder.getRequestData();
-            Logger.getLogger(Dispatcher.class.getName())
-                    .info("Sending *non-caching* http request: " + builder.getHTTPMethod() + " "
-                    + builder.getUrl() + " (Content: `" + content + "´)");
+            Logger.getLogger(Dispatcher.class.getName()).info(
+                "Sending *non-caching* http request: " + builder.getHTTPMethod() + " " + builder.getUrl() +
+                    " (Content: `" + content + "´)");
         }
 
-//            /*
-//             * add X-Request-Token to all non-caching calls (!= GET) if we have some
-//             */
-//            builder.setHeader("X-Testing", "Bude");
+        //            /*
+        //             * add X-Request-Token to all non-caching calls (!= GET) if we have some
+        //             */
+        //            builder.setHeader("X-Testing", "Bude");
 
         builder.setCallback(callbackFactory.createCallback(method));
         return true;// continue filtering

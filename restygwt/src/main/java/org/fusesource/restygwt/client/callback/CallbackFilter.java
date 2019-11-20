@@ -18,10 +18,10 @@
 
 package org.fusesource.restygwt.client.callback;
 
-import org.fusesource.restygwt.client.Method;
-
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
+
+import org.fusesource.restygwt.client.Method;
 
 public interface CallbackFilter {
 
@@ -36,7 +36,6 @@ public interface CallbackFilter {
      *
      * @return continue chain or not
      */
-    public RequestCallback filter(final Method method, final Response response,
-            RequestCallback callback);
+    RequestCallback filter(Method method, Response response, RequestCallback callback);
 
 }

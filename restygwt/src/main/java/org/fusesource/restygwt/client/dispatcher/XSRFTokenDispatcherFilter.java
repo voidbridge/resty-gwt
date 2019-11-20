@@ -18,23 +18,23 @@
 
 package org.fusesource.restygwt.client.dispatcher;
 
+import com.google.gwt.http.client.RequestBuilder;
+
 import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.callback.XSRFToken;
-
-import com.google.gwt.http.client.RequestBuilder;
 
 public class XSRFTokenDispatcherFilter implements DispatcherFilter {
 
     private XSRFToken xsrf;
 
-    public XSRFTokenDispatcherFilter(final XSRFToken xsrf) {
+    public XSRFTokenDispatcherFilter(XSRFToken xsrf) {
         this.xsrf = xsrf;
     }
-    
+
     @Override
-    public boolean filter(final Method method, final RequestBuilder builder) {
-        if (this.xsrf.getToken() !=null) {
-            method.header(this.xsrf.getHeaderKey(), this.xsrf.getToken());
+    public boolean filter(Method method, RequestBuilder builder) {
+        if (xsrf.getToken() != null) {
+            method.header(xsrf.getHeaderKey(), xsrf.getToken());
         }
         return true;// continue filtering
     }

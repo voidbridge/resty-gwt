@@ -1,15 +1,15 @@
 package org.fusesource.restygwt.rebind.util;
 
-import org.fusesource.restygwt.client.basic.DirectExampleService;
-
 import java.lang.reflect.Method;
+
 import javax.ws.rs.Path;
+
 import junit.framework.TestCase;
 
+import org.fusesource.restygwt.client.basic.DirectExampleService;
 import org.junit.Test;
 
-public class AnnotationCopyUtilTestCase extends TestCase
-{
+public class AnnotationCopyUtilTestCase extends TestCase {
     @Test
     public void testPathWithRegexParam() throws Exception {
 

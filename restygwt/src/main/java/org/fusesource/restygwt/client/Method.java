@@ -18,16 +18,6 @@
 
 package org.fusesource.restygwt.client;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.fusesource.restygwt.rebind.AnnotationResolver;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.http.client.Request;
@@ -41,6 +31,17 @@ import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.logging.client.LogConfiguration;
 import com.google.gwt.xml.client.Document;
 import com.google.gwt.xml.client.XMLParser;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.fusesource.restygwt.rebind.AnnotationResolver;
+
 /**
  *
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
@@ -60,16 +61,17 @@ public class Method {
      *
      * @author chirino
      */
-    static private class MethodRequestBuilder extends RequestBuilder {
+    private static class MethodRequestBuilder extends RequestBuilder {
         public MethodRequestBuilder(String method, String url) {
 
             super(method, url);
             //without null value being explicitly set gwt would generate "undefined" as a default value,
-            //so if request does not have a body, Internet Explorer would send string "undefined" in the body of POST, PUT and DELETE requests,
+            //so if request does not have a body, Internet Explorer would send string "undefined" in the body of
+            // POST, PUT and DELETE requests,
             //which may cause the request to fall on server with "No operation matching request path"
             setRequestData(null);
-            if(Defaults.isAddXHttpMethodOverrideHeader()){
-            	setHeader("X-HTTP-Method-Override", method);
+            if (Defaults.isAddXHttpMethodOverrideHeader()) {
+                setHeader("X-HTTP-Method-Override", method);
             }
         }
     }
@@ -77,14 +79,16 @@ public class Method {
     public RequestBuilder builder;
 
     final Set<Integer> expectedStatuses;
+
     {
-      expectedStatuses = new HashSet<Integer>();
-      expectedStatuses.add(200);
-      expectedStatuses.add(201);
-      expectedStatuses.add(204);
-      // This is needed for MSIE mangling with status 204 to become 1223
-      expectedStatuses.add(1223);
+        expectedStatuses = new HashSet<Integer>();
+        expectedStatuses.add(200);
+        expectedStatuses.add(201);
+        expectedStatuses.add(204);
+        // This is needed for MSIE mangling with status 204 to become 1223
+        expectedStatuses.add(1223);
     }
+
     boolean anyStatus;
 
     Request request;
@@ -173,41 +177,41 @@ public class Method {
      * any of the values specified then the request is considered to have failed.  Defaults to accepting
      * 200,201,204. If set to -1 then any status code is considered a success.
      */
-    public Method expect(int ... statuses) {
-        if ( statuses.length==1 && statuses[0] < 0) {
+    public Method expect(int... statuses) {
+        if (statuses.length == 1 && statuses[0] < 0) {
             anyStatus = true;
         } else {
             anyStatus = false;
-            this.expectedStatuses.clear();
-            for( int status : statuses ) {
-                this.expectedStatuses.add(status);
+            expectedStatuses.clear();
+            for (int status : statuses) {
+                expectedStatuses.add(status);
             }
         }
         return this;
     }
 
-	/**
+    /**
      * Local file-system (file://) does not return any status codes.
      * Therefore - if we read from the file-system we accept all codes.
-     * 
+     *
      * This is for instance relevant when developing a PhoneGap application with
      * restyGwt.
      */
     public boolean isExpected(int status) {
-    	
-    	String baseUrl = GWT.getHostPageBaseURL();
-    	String requestUrl = builder.getUrl();
-		
-    	if (FileSystemHelper.isRequestGoingToFileSystem(baseUrl, requestUrl)) {
-    		return true;
-    	} else if (anyStatus) {
+
+        String baseUrl = GWT.getHostPageBaseURL();
+        String requestUrl = builder.getUrl();
+
+        if (FileSystemHelper.isRequestGoingToFileSystem(baseUrl, requestUrl)) {
+            return true;
+        } else if (anyStatus) {
             return true;
         } else {
-            return this.expectedStatuses.contains(status);
+            return expectedStatuses.contains(status);
         }
     }
 
-    public Object send(final RequestCallback callback) throws RequestException {
+    public Object send(RequestCallback callback) throws RequestException {
         doSetTimeout();
         builder.setCallback(callback);
         // lazily load dispatcher from defaults, if one is not set yet.
@@ -216,17 +220,17 @@ public class Method {
     }
 
     private Logger getLogger() {
-        if (GWT.isClient() && LogConfiguration.loggingIsEnabled() && this.logger == null) {
-            this.logger = Logger.getLogger( Method.class.getName() );
+        if (GWT.isClient() && LogConfiguration.loggingIsEnabled() && logger == null) {
+            logger = Logger.getLogger(Method.class.getName());
         }
-        return this.logger;
+        return logger;
     }
 
-    public Object send(final TextCallback callback) {
+    public Object send(TextCallback callback) {
         return send((MethodCallback<String>) callback);
     }
 
-    public Object send(final MethodCallback<String> callback) {
+    public Object send(MethodCallback<String> callback) {
         defaultAcceptType(Resource.CONTENT_TYPE_TEXT);
         try {
             return send(new AbstractRequestCallback<String>(this, callback) {
@@ -236,15 +240,16 @@ public class Method {
                 }
             });
         } catch (Throwable e) {
-            if( getLogger() != null ){
-                getLogger().log(Level.FINE, "Received http error for: " + builder.getHTTPMethod() + " " + builder.getUrl(), e);
+            if (getLogger() != null) {
+                getLogger()
+                    .log(Level.FINE, "Received http error for: " + builder.getHTTPMethod() + " " + builder.getUrl(), e);
             }
             callback.onFailure(this, e);
             return null;
         }
     }
 
-    public Object send(final JsonCallback callback) {
+    public Object send(JsonCallback callback) {
         defaultAcceptType(Resource.CONTENT_TYPE_JSON);
 
         try {
@@ -259,15 +264,16 @@ public class Method {
                 }
             });
         } catch (Throwable e) {
-            if( getLogger() != null ){
-                getLogger().log(Level.FINE, "Received http error for: " + builder.getHTTPMethod() + " " + builder.getUrl(), e);
+            if (getLogger() != null) {
+                getLogger()
+                    .log(Level.FINE, "Received http error for: " + builder.getHTTPMethod() + " " + builder.getUrl(), e);
             }
             callback.onFailure(this, e);
             return null;
         }
     }
 
-    public Object send(final XmlCallback callback) {
+    public Object send(XmlCallback callback) {
         defaultAcceptType(Resource.CONTENT_TYPE_XML);
         try {
             return send(new AbstractRequestCallback<Document>(this, callback) {
@@ -281,15 +287,16 @@ public class Method {
                 }
             });
         } catch (Throwable e) {
-            if( getLogger() != null ){
-                getLogger().log(Level.FINE, "Received http error for: " + builder.getHTTPMethod() + " " + builder.getUrl(), e);
+            if (getLogger() != null) {
+                getLogger()
+                    .log(Level.FINE, "Received http error for: " + builder.getHTTPMethod() + " " + builder.getUrl(), e);
             }
             callback.onFailure(this, e);
             return null;
         }
     }
 
-    public <T extends JavaScriptObject> Object send(final OverlayCallback<T> callback) {
+    public <T extends JavaScriptObject> Object send(OverlayCallback<T> callback) {
 
 
         defaultAcceptType(Resource.CONTENT_TYPE_JSON);
@@ -315,8 +322,9 @@ public class Method {
                 }
             });
         } catch (Throwable e) {
-            if( getLogger() != null ){
-                getLogger().log(Level.FINE, "Received http error for: " + builder.getHTTPMethod() + " " + builder.getUrl(), e);
+            if (getLogger() != null) {
+                getLogger()
+                    .log(Level.FINE, "Received http error for: " + builder.getHTTPMethod() + " " + builder.getUrl(), e);
             }
             callback.onFailure(this, e);
             return null;

@@ -18,18 +18,19 @@
 
 package org.fusesource.restygwt.client.codec;
 
-import org.fusesource.restygwt.client.JsonEncoderDecoder;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.junit.client.GWTTestCase;
+
+import org.fusesource.restygwt.client.JsonEncoderDecoder;
 
 public class PolymorphicEncoderDecoderTestGwt extends GWTTestCase {
 
@@ -39,12 +40,13 @@ public class PolymorphicEncoderDecoderTestGwt extends GWTTestCase {
     }
 
     @JsonTypeInfo(use = Id.CLASS, include = As.PROPERTY, property = "@class")
-    @JsonSubTypes({ @Type(DefaultImplementationOfSubTypeInterface.class), @Type(SecondImplementationOfSubTypeInterface.class) })
+    @JsonSubTypes(
+        { @Type(DefaultImplementationOfSubTypeInterface.class), @Type(SecondImplementationOfSubTypeInterface.class) })
     interface JsonSubTypesWithAnInterface {
         String getValue();
     }
 
-    static abstract class AbstractSubType implements JsonSubTypesWithAnInterface {
+    abstract static class AbstractSubType implements JsonSubTypesWithAnInterface {
     }
 
     static class DefaultImplementationOfSubTypeInterface extends AbstractSubType {
@@ -72,10 +74,11 @@ public class PolymorphicEncoderDecoderTestGwt extends GWTTestCase {
         }
     }
 
-    static interface JsonSubTypesWithAnInterfaceCodec extends JsonEncoderDecoder<JsonSubTypesWithAnInterface> {
+    interface JsonSubTypesWithAnInterfaceCodec extends JsonEncoderDecoder<JsonSubTypesWithAnInterface> {
     }
 
-    static interface JsonSubTypesWithAnInterfaceImplementationCodec extends JsonEncoderDecoder<DefaultImplementationOfSubTypeInterface> {
+    interface JsonSubTypesWithAnInterfaceImplementationCodec
+        extends JsonEncoderDecoder<DefaultImplementationOfSubTypeInterface> {
     }
 
     public void testJsonSubTypesWithAnInterface() {
@@ -84,7 +87,8 @@ public class PolymorphicEncoderDecoderTestGwt extends GWTTestCase {
         JsonSubTypesWithAnInterface o1 = new DefaultImplementationOfSubTypeInterface(value);
 
         JSONValue json = codec.encode(o1);
-        assertEquals(json.isObject().get("@class").isString().stringValue(), DefaultImplementationOfSubTypeInterface.class.getName().replace("$", "."));
+        assertEquals(json.isObject().get("@class").isString().stringValue(),
+            DefaultImplementationOfSubTypeInterface.class.getName().replace("$", "."));
         JsonSubTypesWithAnInterface o2 = codec.decode(json);
         assertEquals(json.toString(), codec.encode(o2).toString());
         assertEquals(value, o1.getValue());
@@ -93,15 +97,16 @@ public class PolymorphicEncoderDecoderTestGwt extends GWTTestCase {
     }
 
     public void testJsonSubTypesWithInterfaceUsingConcreteImplementationCodec() {
-        JsonSubTypesWithAnInterfaceImplementationCodec codec = GWT.create(JsonSubTypesWithAnInterfaceImplementationCodec.class);
+        JsonSubTypesWithAnInterfaceImplementationCodec codec =
+            GWT.create(JsonSubTypesWithAnInterfaceImplementationCodec.class);
         String value = "Hello, world!";
         DefaultImplementationOfSubTypeInterface o1 = new DefaultImplementationOfSubTypeInterface(value);
 
         JSONValue json = codec.encode(o1);
         JSONValue objectClass = json.isObject().get("@class");
         assertNotNull(objectClass);
-        assertEquals(DefaultImplementationOfSubTypeInterface.class.getName().replace("$","."),
-        		objectClass.isString().stringValue());
+        assertEquals(DefaultImplementationOfSubTypeInterface.class.getName().replace("$", "."),
+            objectClass.isString().stringValue());
         DefaultImplementationOfSubTypeInterface o2 = codec.decode(json);
         assertEquals(json.toString(), codec.encode(o2).toString());
         assertEquals(value, o1.getValue());
@@ -120,11 +125,13 @@ public class PolymorphicEncoderDecoderTestGwt extends GWTTestCase {
         HELLO, WORLD
     }
 
-    static interface JsonSubTypesWithAnInterfaceForUseWithAnEnumCodec extends JsonEncoderDecoder<JsonSubTypesWithAnInterfaceForUseWithAnEnum> {
+    interface JsonSubTypesWithAnInterfaceForUseWithAnEnumCodec
+        extends JsonEncoderDecoder<JsonSubTypesWithAnInterfaceForUseWithAnEnum> {
     }
 
     public void testJsonSubTypesWithAnInterfaceImplementedByAnEnum() {
-        JsonSubTypesWithAnInterfaceForUseWithAnEnumCodec codec = GWT.create(JsonSubTypesWithAnInterfaceForUseWithAnEnumCodec.class);
+        JsonSubTypesWithAnInterfaceForUseWithAnEnumCodec codec =
+            GWT.create(JsonSubTypesWithAnInterfaceForUseWithAnEnumCodec.class);
         JSONValue json = codec.encode(EnumOfSubTypeInterface.HELLO);
         JsonSubTypesWithAnInterfaceForUseWithAnEnum useWithAnEnum = codec.decode(json);
         assertEquals(useWithAnEnum.name(), EnumOfSubTypeInterface.HELLO.name());
@@ -159,7 +166,7 @@ public class PolymorphicEncoderDecoderTestGwt extends GWTTestCase {
         }
     }
 
-    static interface JsonPropertyOnSuperClassCodec extends JsonEncoderDecoder<BaseForJsonProperty> {
+    interface JsonPropertyOnSuperClassCodec extends JsonEncoderDecoder<BaseForJsonProperty> {
     }
 
     public void testJsonPropertyOnSuperClass() {
@@ -171,15 +178,17 @@ public class PolymorphicEncoderDecoderTestGwt extends GWTTestCase {
 
         JSONValue json = codec.encode(o1);
 
-        assertEquals("{\"@class\":\"org.fusesource.restygwt.client.codec.PolymorphicEncoderDecoderTestGwt.SubForJsonProperty\", \"otherField\":\"other-field-value\", \"myField\":\"my-field-value\"}", json.toString());
+        assertEquals("{\"@class\":\"org.fusesource.restygwt.client.codec.PolymorphicEncoderDecoderTestGwt" +
+                ".SubForJsonProperty\", \"otherField\":\"other-field-value\", \"myField\":\"my-field-value\"}",
+            json.toString());
     }
 
     // ######################################################################################
 
-    @JsonSubTypes({ @Type(A.class), @Type(B.class) })
+    @JsonTypeInfo(use = Id.NAME, include = As.PROPERTY, property = "@class")
     @JsonTypeName("A")
-    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-    static public class A {
+    @JsonSubTypes({@Type(A.class), @Type(B.class)})
+    public static class A {
         private String code;
 
         public String getCode() {
@@ -192,7 +201,7 @@ public class PolymorphicEncoderDecoderTestGwt extends GWTTestCase {
     }
 
     @JsonTypeName("B")
-    static public class B extends A {
+    public static class B extends A {
         private String desc;
 
         public String getDesc() {
@@ -204,7 +213,7 @@ public class PolymorphicEncoderDecoderTestGwt extends GWTTestCase {
         }
     }
 
-    static public interface IdNamePolymorphicCodec extends JsonEncoderDecoder<A> {
+    public interface IdNamePolymorphicCodec extends JsonEncoderDecoder<A> {
     }
 
     public void testIdNamePolymorphic() {

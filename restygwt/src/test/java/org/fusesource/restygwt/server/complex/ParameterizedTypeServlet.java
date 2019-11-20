@@ -18,10 +18,10 @@
 
 package org.fusesource.restygwt.server.complex;
 
-import java.io.ByteArrayOutputStream;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
+
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -32,61 +32,49 @@ import org.fusesource.restygwt.client.basic.ParameterizedTypeServiceInterfaces;
 import org.fusesource.restygwt.client.basic.ParameterizedTypeServiceInterfaces.Thing;
 import org.fusesource.restygwt.client.complex.JsonTypeIdResolver.DTOInterface;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
-
 @SuppressWarnings("serial")
-public class ParameterizedTypeServlet
-{
-	/**
-	 * Ignores input and outputs a value.
-	 */
-	public static abstract class JacksonOutputServlet extends HttpServlet
-	{
-		@Override
-		protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
-		{
-			Object o = getThing();
-			resp.setContentType("application/json");
-			new ObjectMapper().writeValue(resp.getOutputStream(), o);
-		}
-		
-		protected abstract Object getThing();
-	}
-	
-	public static class IntServlet extends JacksonOutputServlet
-	{
-		@Override
-		protected Integer getThing()
-		{
-			return 123456;
-		}
-		
-	}
-	
-	public static class ThingServlet extends JacksonOutputServlet
-	{
-		@Override
-		protected ParameterizedTypeServiceInterfaces.Thing getThing()
-		{
-			Thing thing = new Thing();
-			thing.name = "Fred Flintstone";
-			thing.shoeSize = 12;
-			return thing;
-		}
-	}
-	
-	
-	public static class EchoNameServlet extends HttpServlet
-	{
-		@Override
-		protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
-		{
-			ObjectMapper mapper = new ObjectMapper();
-			ObjectReader reader = mapper.reader(DTOInterface.class);
-			DTOInterface dto = reader.readValue(req.getInputStream());
-			resp.setContentType("application/json");
-			mapper.writeValue(resp.getOutputStream(), dto.getName());
-		}
-	}
+public class ParameterizedTypeServlet {
+    /**
+     * Ignores input and outputs a value.
+     */
+    public abstract static class JacksonOutputServlet extends HttpServlet {
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            Object o = getThing();
+            resp.setContentType("application/json");
+            new ObjectMapper().writeValue(resp.getOutputStream(), o);
+        }
+
+        protected abstract Object getThing();
+    }
+
+    public static class IntServlet extends JacksonOutputServlet {
+        @Override
+        protected Integer getThing() {
+            return 123456;
+        }
+
+    }
+
+    public static class ThingServlet extends JacksonOutputServlet {
+        @Override
+        protected ParameterizedTypeServiceInterfaces.Thing getThing() {
+            Thing thing = new Thing();
+            thing.name = "Fred Flintstone";
+            thing.shoeSize = 12;
+            return thing;
+        }
+    }
+
+
+    public static class EchoNameServlet extends HttpServlet {
+        @Override
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            ObjectMapper mapper = new ObjectMapper();
+            ObjectReader reader = mapper.reader(DTOInterface.class);
+            DTOInterface dto = reader.readValue(req.getInputStream());
+            resp.setContentType("application/json");
+            mapper.writeValue(resp.getOutputStream(), dto.getName());
+        }
+    }
 }

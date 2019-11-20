@@ -19,16 +19,25 @@
 package org.fusesource.restygwt.client.basic;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.junit.client.GWTTestCase;
-import org.fusesource.restygwt.client.*;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 
+import org.fusesource.restygwt.client.Defaults;
+import org.fusesource.restygwt.client.DirectRestService;
+import org.fusesource.restygwt.client.Method;
+import org.fusesource.restygwt.client.MethodCallback;
+import org.fusesource.restygwt.client.REST;
+import org.fusesource.restygwt.client.Resource;
+import org.fusesource.restygwt.client.RestServiceProxy;
+
 /**
- * @author <a href="mailto:bogdan.mustiata@gmail.com">Bogdan Mustiata</<a>
+ * @author <a href="mailto:bogdan.mustiata@gmail.com">Bogdan Mustiata</a>
  */
 public class DirectRestServiceTestGwt extends GWTTestCase {
     @Override
@@ -36,8 +45,9 @@ public class DirectRestServiceTestGwt extends GWTTestCase {
         return "org.fusesource.restygwt.DirectRestServiceTestGwt";
     }
 
-    static interface InnerDirectRestService extends DirectRestService {
-        @GET @Path("/something")
+    interface InnerDirectRestService extends DirectRestService {
+        @GET
+        @Path("/something")
         void getSomething();
     }
 
@@ -74,6 +84,126 @@ public class DirectRestServiceTestGwt extends GWTTestCase {
         }).call(directExampleService).getExampleDtos("3");
     }
 
+    public void testDateFormat() {
+        delayTestFinish(10000);
+        DirectExampleService directExampleService = GWT.create(DirectExampleService.class);
+
+        Resource resource = new Resource(GWT.getModuleBaseURL() + "api");
+        ((RestServiceProxy) directExampleService).setResource(resource);
+
+        Defaults.setDateFormat(null);
+
+        final Date date = new Date(1506224400000L);
+        REST.withCallback(new MethodCallback<Long>() {
+            @Override
+            public void onSuccess(Method method, Long response) {
+                assertEquals(date.getTime(), response.longValue());
+                finishTest();
+            }
+
+            @Override
+            public void onFailure(Method method, Throwable e) {
+                fail(e.getMessage());
+            }
+        }).call(directExampleService).getDate(date);
+    }
+
+    public void testDateFormatIso8601() {
+        delayTestFinish(10000);
+        DirectExampleService directExampleService = GWT.create(DirectExampleService.class);
+
+        Resource resource = new Resource(GWT.getModuleBaseURL() + "api");
+        ((RestServiceProxy) directExampleService).setResource(resource);
+
+        Defaults.setDateFormat(DateTimeFormat.getFormat(DateTimeFormat.PredefinedFormat.ISO_8601).getPattern());
+
+        final Date date = new Date(1506224400000L);
+        REST.withCallback(new MethodCallback<Long>() {
+            @Override
+            public void onSuccess(Method method, Long response) {
+                assertEquals(date.getTime(), response.longValue());
+                finishTest();
+            }
+
+            @Override
+            public void onFailure(Method method, Throwable e) {
+                fail(e.getMessage());
+            }
+        }).call(directExampleService).getDateIso8601(date);
+    }
+
+    public void testDateFormatIso8601Null() {
+        delayTestFinish(10000);
+        DirectExampleService directExampleService = GWT.create(DirectExampleService.class);
+
+        Resource resource = new Resource(GWT.getModuleBaseURL() + "api");
+        ((RestServiceProxy) directExampleService).setResource(resource);
+
+        Defaults.setDateFormat(DateTimeFormat.getFormat(DateTimeFormat.PredefinedFormat.ISO_8601).getPattern());
+
+        REST.withCallback(new MethodCallback<Long>() {
+            @Override
+            public void onSuccess(Method method, Long response) {
+                assertNull(response);
+                finishTest();
+            }
+
+            @Override
+            public void onFailure(Method method, Throwable e) {
+                fail(e.getMessage());
+            }
+        }).call(directExampleService).getDateIso8601(null);
+    }
+
+    public void testDateFormatCustomPattern() {
+        delayTestFinish(10000);
+        DirectExampleService directExampleService = GWT.create(DirectExampleService.class);
+
+        Resource resource = new Resource(GWT.getModuleBaseURL() + "api");
+        ((RestServiceProxy) directExampleService).setResource(resource);
+
+        // custom pattern contains double quote and single quote to check JSON escaping
+        Defaults.setDateFormat("\"''yyyy-MM-dd'T'HH:mm:ss.SSSZZZ");
+
+        final Date date = new Date(1506224400000L);
+        REST.withCallback(new MethodCallback<Long>() {
+            @Override
+            public void onSuccess(Method method, Long response) {
+                assertEquals(date.getTime(), response.longValue());
+                finishTest();
+            }
+
+            @Override
+            public void onFailure(Method method, Throwable e) {
+                fail(e.getMessage());
+            }
+        }).call(directExampleService).getDateCustomPattern(date);
+    }
+
+    public void testDateFormatCustomPatternNull() {
+        delayTestFinish(10000);
+        DirectExampleService directExampleService = GWT.create(DirectExampleService.class);
+
+        Resource resource = new Resource(GWT.getModuleBaseURL() + "api");
+        ((RestServiceProxy) directExampleService).setResource(resource);
+
+        // custom pattern contains double quote and single quote to check JSON escaping
+        Defaults.setDateFormat("\"''yyyy-MM-dd'T'HH:mm:ss.SSSZZZ");
+
+        REST.withCallback(new MethodCallback<Long>() {
+            @Override
+            public void onSuccess(Method method, Long response) {
+                assertNull(response);
+                finishTest();
+            }
+
+            @Override
+            public void onFailure(Method method, Throwable e) {
+                fail(e.getMessage());
+            }
+        }).call(directExampleService).getDateCustomPattern(null);
+    }
+
     public void testRegexPathParamCall() {
         delayTestFinish(10000);
         DirectExampleService directExampleService = GWT.create(DirectExampleService.class);
@@ -92,7 +222,7 @@ public class DirectRestServiceTestGwt extends GWTTestCase {
             public void onFailure(Method method, Throwable e) {
                 fail(e.getMessage());
             }
-            }).call(directExampleService).getRegexMultiParams(123, 456);
+        }).call(directExampleService).getRegexMultiParams(123, 456);
     }
 
     public void testVoidCall() {

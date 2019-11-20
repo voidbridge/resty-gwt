@@ -18,15 +18,18 @@
 
 package org.fusesource.restygwt.server.basic;
 
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 /**
  * A servlet that just implements the services required for the direct service test.
  *
- * @author <a href="mailto:bogdan.mustiata@gmail.com">Bogdan Mustiata</<a>
+ * @author <a href="mailto:bogdan.mustiata@gmail.com">Bogdan Mustiata</a>
  */
 public class DirectServiceTestGwtServlet extends HttpServlet {
 
@@ -34,10 +37,35 @@ public class DirectServiceTestGwtServlet extends HttpServlet {
     String THREE_ELEMENT_LIST = "[{name:'1'},{name:'2'},{name:'3'}]";
 
     @Override
-    protected void doGet(HttpServletRequest request,
-            HttpServletResponse response) throws IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        if (request.getRequestURI().endsWith("/api/list")) {
+        if (request.getRequestURI().endsWith("/date")) {
+            response.getWriter().print(Long.parseLong(request.getParameter("date")));
+        } else if (request.getRequestURI().endsWith("/dateIso8601")) {
+            try {
+                String date = request.getParameter("date");
+                if (!"null".equals(date)) {
+                    response.getWriter().print(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX").parse(date)
+                            .getTime());
+                } else {
+                    response.getWriter().print((Long) null);
+                }
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+        } else if (request.getRequestURI().endsWith("/dateCustomPattern")) {
+            try {
+                String date = request.getParameter("date");
+                if (!"null".equals(date)) {
+                    response.getWriter().print(new SimpleDateFormat("\"''yyyy-MM-dd'T'HH:mm:ss.SSSX").parse(date)
+                            .getTime());
+                } else {
+                    response.getWriter().print((Long) null);
+                }
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+        } else if (request.getRequestURI().endsWith("/api/list")) {
             response.getWriter().print(THREE_ELEMENT_LIST);
         } else if (request.getRequestURI().matches(".+/\\d+")) {
             String url = request.getRequestURI();
@@ -50,8 +78,7 @@ public class DirectServiceTestGwtServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request,
-                         HttpServletResponse response) throws IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         if (request.getRequestURI().endsWith("/api/store")) {
             response.getWriter().print(EMPTY_RESPONSE);

@@ -18,10 +18,6 @@
 
 package org.fusesource.restygwt.client.cache;
 
-import org.fusesource.restygwt.client.cache.CacheKey;
-import org.fusesource.restygwt.client.cache.VolatileQueueableCacheStorage;
-import org.fusesource.restygwt.client.cache.SimpleCacheKey;
-
 import com.google.gwt.http.client.Header;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.junit.client.GWTTestCase;
@@ -61,14 +57,15 @@ public class VolatileQueueableCacheStorageTestGwt extends GWTTestCase {
         public String getText() {
             return null;
         }
-        
+
     }
+
     @Override
     public String getModuleName() {
         return "org.fusesource.restygwt.VolatileQueueableCacheStorageTestGwt";
     }
-    
-    public void testTimeout() throws Exception{
+
+    public void testTimeout() throws Exception {
         final VolatileQueueableCacheStorage storage = new VolatileQueueableCacheStorage(100);
         final CacheKey key = new SimpleCacheKey("first");
         Response resp = new ResponseMock();
@@ -80,20 +77,20 @@ public class VolatileQueueableCacheStorageTestGwt extends GWTTestCase {
 
             @Override
             public void run() {
-                assertNull(storage.getResultOrReturnNull(key));   
+                assertNull(storage.getResultOrReturnNull(key));
                 finishTest();
             }
-            
+
         };
         timer.schedule(200);
         delayTestFinish(250);
     }
 
-    public void testPurge() throws Exception{
-        final VolatileQueueableCacheStorage storage = new VolatileQueueableCacheStorage();
-        final CacheKey key = new SimpleCacheKey("first");
+    public void testPurge() throws Exception {
+        VolatileQueueableCacheStorage storage = new VolatileQueueableCacheStorage();
+        CacheKey key = new SimpleCacheKey("first");
         Response resp = new ResponseMock();
-          
+
         storage.putResult(key, resp);
         // hashCode should be good enough
         assertEquals(resp.hashCode(), storage.getResultOrReturnNull(key).hashCode());

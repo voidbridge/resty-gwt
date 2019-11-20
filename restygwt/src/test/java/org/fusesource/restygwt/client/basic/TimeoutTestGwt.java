@@ -18,17 +18,18 @@
 
 package org.fusesource.restygwt.client.basic;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.http.client.RequestTimeoutException;
+import com.google.gwt.junit.client.GWTTestCase;
+
+import org.fusesource.restygwt.client.Defaults;
 import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.MethodCallback;
 import org.fusesource.restygwt.client.Resource;
 import org.fusesource.restygwt.client.RestServiceProxy;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.http.client.RequestTimeoutException;
-import com.google.gwt.junit.client.GWTTestCase;
-
 /**
- * @author <a href="mailto:mail@raphaelbauer.com">rEyez</<a>
+ * @author <a href="mailto:mail@raphaelbauer.com">rEyez</a>
  */
 public class TimeoutTestGwt extends GWTTestCase {
 
@@ -39,7 +40,7 @@ public class TimeoutTestGwt extends GWTTestCase {
 
     public void testTimeout() {
 
-        org.fusesource.restygwt.client.Defaults.setRequestTimeout(1000);
+        Defaults.setRequestTimeout(1000);
 
         Resource resource = new Resource(GWT.getModuleBaseURL() + "api/getendpoint");
 
@@ -56,10 +57,9 @@ public class TimeoutTestGwt extends GWTTestCase {
 
             @Override
             public void onFailure(Method method, Throwable exception) {
-                if ( exception instanceof RequestTimeoutException ) {
+                if (exception instanceof RequestTimeoutException) {
                     finishTest();
-                }
-                else {
+                } else {
                     fail();
                 }
             }

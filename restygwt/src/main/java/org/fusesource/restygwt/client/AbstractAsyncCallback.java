@@ -18,15 +18,15 @@
 
 package org.fusesource.restygwt.client;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.logging.client.LogConfiguration;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -46,41 +46,40 @@ public abstract class AbstractAsyncCallback<T> implements AsyncCallback<JavaScri
     }
 
     @Override
-    final public void onFailure(Throwable exception) {
-        callback.onFailure(this.method, exception);
+    public final void onFailure(Throwable exception) {
+        callback.onFailure(method, exception);
     }
 
     private Logger getLogger() {
-        if ( GWT.isClient() && LogConfiguration.loggingIsEnabled() && this.logger == null) {
-            this.logger = Logger.getLogger( AbstractAsyncCallback.class.getName() );
+        if (GWT.isClient() && LogConfiguration.loggingIsEnabled() && logger == null) {
+            logger = Logger.getLogger(AbstractAsyncCallback.class.getName());
         }
-        return this.logger;
+        return logger;
     }
-    
+
     @Override
-    final public void onSuccess(JavaScriptObject result) {
+    public final void onSuccess(JavaScriptObject result) {
         try {
-            if ( getLogger() != null ) {
+            if (getLogger() != null) {
                 getLogger().fine("Received http response for jsonp request");
             }
-            if (result == null){
-                callback.onSuccess(this.method, null);
-            }
-            else{
+            if (result == null) {
+                callback.onSuccess(method, null);
+            } else {
                 JSONObject json = new JSONObject(result);
-                if ( getLogger() != null ) {
+                if (getLogger() != null) {
                     getLogger().fine(json.toString());
                 }
-                callback.onSuccess(this.method, parseResult(json));
+                callback.onSuccess(method, parseResult(json));
             }
         } catch (Throwable e) {
-            if ( getLogger() != null ) {
+            if (getLogger() != null) {
                 getLogger().log(Level.FINE, "Could not parse response: " + e, e);
             }
-            callback.onFailure(this.method, e);
+            callback.onFailure(method, e);
             return;
         }
     }
 
-    abstract protected T parseResult(JSONValue result) throws Exception;
+    protected abstract T parseResult(JSONValue result) throws Exception;
 }

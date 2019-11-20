@@ -18,8 +18,6 @@
 
 package org.fusesource.restygwt.client;
 
-import java.util.Map;
-
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestCallback;
@@ -31,9 +29,11 @@ import com.google.gwt.jsonp.client.JsonpRequestBuilder;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.xml.client.Document;
 
+import java.util.Map;
+
 /**
  * A specialized method which accesses a resource as a JSONP request.
- * 
+ *
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
 public class JsonpMethod extends Method {
@@ -44,7 +44,7 @@ public class JsonpMethod extends Method {
     public JsonpMethod(Resource resource) {
         this.resource = resource;
     }
-    
+
     public JsonpMethod callbackParam(String callbackParam) {
         jsonpBuilder.setCallbackParam(callbackParam);
         return this;
@@ -95,7 +95,7 @@ public class JsonpMethod extends Method {
      * helper method to make RestServiceClassCreator easier to maintain
      * @param callback
      */
-    public Object send(final AsyncCallback<JavaScriptObject> callback) {
+    public Object send(AsyncCallback<JavaScriptObject> callback) {
         return jsonpBuilder.requestObject(resource.getUri(), callback);
     }
 
@@ -105,7 +105,7 @@ public class JsonpMethod extends Method {
     }
 
     @Override
-    public Method expect(int ...status) {
+    public Method expect(int... status) {
         throw unsupported();
     }
 

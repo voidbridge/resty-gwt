@@ -18,6 +18,9 @@
 
 package org.fusesource.restygwt.server.complex;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gwt.thirdparty.guava.common.collect.Lists;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,53 +35,44 @@ import org.fusesource.restygwt.client.complex.JsonTypeIdResolver.AbstractDTO;
 import org.fusesource.restygwt.client.complex.JsonTypeIdResolver.DTOCustom1;
 import org.fusesource.restygwt.client.complex.JsonTypeIdResolver.DTOCustom2;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gwt.thirdparty.guava.common.collect.Lists;
+public class DTOTypeResolverInsideServlet extends HttpServlet {
+    private static final long serialVersionUID = 8761900300798640874L;
 
-public class DTOTypeResolverInsideServlet extends HttpServlet
-{
-	private static final long serialVersionUID = 8761900300798640874L;
+    /**
+     * Fake method to introspect to get generic type
+     * @return null
+     */
+    public List<AbstractDTO> prototype() {
+        return null;
+    }
 
-	/**
-	 * Fake method to introspect to get generic type
-	 * @return null
-	 */
-	public List<AbstractDTO> prototype()
-	{
-		return null;
-	}
-	
-	private static class AbstractCustomDtoList extends ArrayList<AbstractCustomDto> {
-		public AbstractCustomDtoList(List<AbstractCustomDto> abstractAccountTransactionDTOs) {
-			this.addAll(abstractAccountTransactionDTOs);
-		}
-	}	
-	
-	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
-	{
-		DTOCustom1 one = new DTOCustom1();
-		one.name = "Fred Flintstone";
-		one.size = 1024;
+    private static class AbstractCustomDtoList extends ArrayList<AbstractCustomDto> {
+        public AbstractCustomDtoList(List<AbstractCustomDto> abstractAccountTransactionDTOs) {
+            addAll(abstractAccountTransactionDTOs);
+        }
+    }
 
-		DTOCustom2 two = new DTOCustom2();
-		two.name = "Barney Rubble";
-		two.foo = "schmaltzy";
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        DTOCustom1 one = new DTOCustom1();
+        one.name = "Fred Flintstone";
+        one.size = 1024;
 
-		DTOCustom2 three = new DTOCustom2();
-		three.name = "BamBam Rubble";
-		three.foo = "dorky";
+        DTOCustom2 two = new DTOCustom2();
+        two.name = "Barney Rubble";
+        two.foo = "schmaltzy";
 
-		resp.setContentType("application/json");
-		ObjectMapper om = new ObjectMapper();
-		try
-		{
-			AbstractCustomDtoList list = new AbstractCustomDtoList(Lists.newArrayList(one, two, three));
-			om.writeValue(resp.getOutputStream(), list);
-		}
-		catch (Exception e)
-		{
-			throw new ServletException(e);
-		}
-	}
+        DTOCustom2 three = new DTOCustom2();
+        three.name = "BamBam Rubble";
+        three.foo = "dorky";
+
+        resp.setContentType("application/json");
+        ObjectMapper om = new ObjectMapper();
+        try {
+            AbstractCustomDtoList list = new AbstractCustomDtoList(Lists.newArrayList(one, two, three));
+            om.writeValue(resp.getOutputStream(), list);
+        } catch (Exception e) {
+            throw new ServletException(e);
+        }
+    }
 }

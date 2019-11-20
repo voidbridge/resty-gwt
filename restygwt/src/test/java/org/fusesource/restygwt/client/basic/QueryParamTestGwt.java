@@ -18,6 +18,9 @@
 
 package org.fusesource.restygwt.client.basic;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.junit.client.GWTTestCase;
+
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 
@@ -26,9 +29,6 @@ import org.fusesource.restygwt.client.MethodCallback;
 import org.fusesource.restygwt.client.Resource;
 import org.fusesource.restygwt.client.RestService;
 import org.fusesource.restygwt.client.RestServiceProxy;
-
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.junit.client.GWTTestCase;
 
 /**
  *
@@ -46,21 +46,21 @@ public class QueryParamTestGwt extends GWTTestCase {
     }
 
     @Path("/get")
-    static interface QueryTestRestService extends RestService {
-        
+    interface QueryTestRestService extends RestService {
+
         void get(@QueryParam(value = "id") int id, MethodCallback<Echo> callback);
 
         void get(@QueryParam(value = "id") Integer id, MethodCallback<Echo> callback);
     }
-    
+
     class EchoMethodCallback implements MethodCallback<Echo> {
-        
+
         private final String id;
 
-        EchoMethodCallback(String id){
+        EchoMethodCallback(String id) {
             this.id = id;
         }
-        
+
         @Override
         public void onSuccess(Method method, Echo response) {
 
@@ -76,53 +76,54 @@ public class QueryParamTestGwt extends GWTTestCase {
             fail();
         }
     }
-    
+
     @Override
     protected void gwtSetUp() throws Exception {
-        super.gwtSetUp();        
-        service = GWT.create(QueryTestRestService.class);  
+        super.gwtSetUp();
+        service = GWT.create(QueryTestRestService.class);
         Resource resource = new Resource(GWT.getModuleBaseURL() + "echo");
         ((RestServiceProxy) service).setResource(resource);
     }
 
     public void testGetWithInteger() {
-    
+
         service.get(new Integer(2), new EchoMethodCallback("2"));
 
     }
 
     public void testGetWithNull() {
-    
-        service.get(null, new MethodCallback<Echo>(){
+
+        service.get(null, new MethodCallback<Echo>() {
 
             @Override
             public void onFailure(Method method, Throwable exception) {
-                
+
                 fail();
-                
+
             }
 
             @Override
             public void onSuccess(Method method, Echo response) {
-                
+
                 assertFalse(response.params.containsKey("id"));
                 assertEquals(response.params.size(), 0);
-                
+
             }
         });
 
     }
 
     public void testGetWithInt() {
-    
+
         service.get(123, new EchoMethodCallback("123"));
 
     }
 
+    @Override
     public void gwtTearDown() {
 
         // wait... we are in async testing...
         delayTestFinish(10000);
-        
+
     }
 }

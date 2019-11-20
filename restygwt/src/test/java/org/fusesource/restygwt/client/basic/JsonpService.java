@@ -18,6 +18,8 @@
 
 package org.fusesource.restygwt.client.basic;
 
+import com.google.gwt.jsonp.client.JsonpRequest;
+
 import java.util.List;
 
 import javax.ws.rs.Path;
@@ -25,8 +27,6 @@ import javax.ws.rs.Path;
 import org.fusesource.restygwt.client.JSONP;
 import org.fusesource.restygwt.client.MethodCallback;
 import org.fusesource.restygwt.client.RestService;
-
-import com.google.gwt.jsonp.client.JsonpRequest;
 
 /**
  *
@@ -36,20 +36,20 @@ import com.google.gwt.jsonp.client.JsonpRequest;
 public interface JsonpService extends RestService {
 
     @JSONP
-    public void someJsonp(MethodCallback<ExampleDto> callback);
+    void someJsonp(MethodCallback<ExampleDto> callback);
 
     /**
      * Used to make sure the generator handles JsonpRequest result.
      * It can be used to cancel requests.
      */
     @JSONP
-    public JsonpRequest<ExampleDto> someCancelableJsonp(MethodCallback<ExampleDto> callback);
+    JsonpRequest<ExampleDto> someCancelableJsonp(MethodCallback<ExampleDto> callback);
 
     @Path("list")
     @JSONP
-    public void someJsonpWithList(MethodCallback<List<ExampleDto>> callback);
+    void someJsonpWithList(MethodCallback<List<ExampleDto>> callback);
 
     @JSONP(callbackParam = "null") // param name used by test servlet produce null
-    public void someOtherJsonp(MethodCallback<ExampleDto> callback);
+    void someOtherJsonp(MethodCallback<ExampleDto> callback);
 
 }

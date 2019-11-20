@@ -18,6 +18,8 @@
 
 package org.fusesource.restygwt.client.event;
 
+import com.google.gwt.json.client.JSONValue;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.PUT;
@@ -30,8 +32,6 @@ import org.fusesource.restygwt.client.RestService;
 import org.fusesource.restygwt.client.cache.Domain;
 import org.fusesource.restygwt.client.event.type.Foo;
 
-import com.google.gwt.json.client.JSONValue;
-
 /**
  * @author <a href="mailto:andi.balke@gmail.com">Andi</a>
  */
@@ -39,12 +39,11 @@ import com.google.gwt.json.client.JSONValue;
 public interface ModelChangeAnnotatedService extends RestService {
     @GET
     @Path("/foo/")
-    public void getItems(@HeaderParam("X-Echo-Body") String responseBody,
-            MethodCallback<JSONValue> callback);
+    void getItems(@HeaderParam("X-Echo-Body") String responseBody, MethodCallback<JSONValue> callback);
 
     @PUT
     @Path("/foo/{fooId}")
     @ModelChange
-    public void setItem(@HeaderParam("X-Echo-Code") int responseCode,
-            @PathParam("fooId") int fooId, MethodCallback<Void> callback);
+    void setItem(@HeaderParam("X-Echo-Code") int responseCode, @PathParam("fooId") int fooId,
+                 MethodCallback<Void> callback);
 }

@@ -18,15 +18,15 @@
 
 package org.fusesource.restygwt.rebind;
 
-import java.util.Map;
-
-import org.fusesource.restygwt.client.MethodCallback;
-import org.fusesource.restygwt.client.RestService;
-
 import com.google.gwt.core.ext.TreeLogger;
 import com.google.gwt.core.ext.UnableToCompleteException;
 import com.google.gwt.core.ext.typeinfo.JClassType;
 import com.google.gwt.core.ext.typeinfo.JMethod;
+
+import java.util.Map;
+
+import org.fusesource.restygwt.client.MethodCallback;
+import org.fusesource.restygwt.client.RestService;
 
 /**
  * Interface to create Class- and Method-Annotations on RestService Interfaces
@@ -55,6 +55,6 @@ public interface AnnotationResolver {
      * e.g. returning ``new String[]{"key", "value"}``
      *      will result in ``__method.addData("key", "value")``
      */
-    public Map<String, String[]> resolveAnnotation(TreeLogger logger, JClassType source, JMethod method,
-            final String restMethod) throws UnableToCompleteException;
+    Map<String, String[]> resolveAnnotation(TreeLogger logger, JClassType source, JMethod method,
+                                            String restMethod) throws UnableToCompleteException;
 }

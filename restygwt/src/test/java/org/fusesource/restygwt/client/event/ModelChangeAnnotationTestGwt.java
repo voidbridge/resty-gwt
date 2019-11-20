@@ -18,25 +18,6 @@
 
 package org.fusesource.restygwt.client.event;
 
-import org.fusesource.restygwt.client.Defaults;
-import org.fusesource.restygwt.client.Method;
-import org.fusesource.restygwt.client.MethodCallback;
-import org.fusesource.restygwt.client.ModelChange;
-import org.fusesource.restygwt.client.Resource;
-import org.fusesource.restygwt.client.RestServiceProxy;
-import org.fusesource.restygwt.client.cache.VolatileQueueableCacheStorage;
-import org.fusesource.restygwt.client.cache.QueueableCacheStorage;
-import org.fusesource.restygwt.client.callback.CachingCallbackFilter;
-import org.fusesource.restygwt.client.callback.CallbackFactory;
-import org.fusesource.restygwt.client.callback.FilterawareRequestCallback;
-import org.fusesource.restygwt.client.callback.DefaultFilterawareRequestCallback;
-import org.fusesource.restygwt.client.callback.ModelChangeCallbackFilter;
-import org.fusesource.restygwt.client.dispatcher.CachingDispatcherFilter;
-import org.fusesource.restygwt.client.dispatcher.FilterawareDispatcher;
-import org.fusesource.restygwt.client.dispatcher.DefaultFilterawareDispatcher;
-import org.fusesource.restygwt.client.event.type.Foo;
-import org.fusesource.restygwt.example.client.event.ModelChangeEvent;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.SimpleEventBus;
@@ -44,6 +25,25 @@ import com.google.gwt.http.client.Response;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.junit.client.GWTTestCase;
+
+import org.fusesource.restygwt.client.Defaults;
+import org.fusesource.restygwt.client.Method;
+import org.fusesource.restygwt.client.MethodCallback;
+import org.fusesource.restygwt.client.ModelChange;
+import org.fusesource.restygwt.client.Resource;
+import org.fusesource.restygwt.client.RestServiceProxy;
+import org.fusesource.restygwt.client.cache.QueueableCacheStorage;
+import org.fusesource.restygwt.client.cache.VolatileQueueableCacheStorage;
+import org.fusesource.restygwt.client.callback.CachingCallbackFilter;
+import org.fusesource.restygwt.client.callback.CallbackFactory;
+import org.fusesource.restygwt.client.callback.DefaultFilterawareRequestCallback;
+import org.fusesource.restygwt.client.callback.FilterawareRequestCallback;
+import org.fusesource.restygwt.client.callback.ModelChangeCallbackFilter;
+import org.fusesource.restygwt.client.dispatcher.CachingDispatcherFilter;
+import org.fusesource.restygwt.client.dispatcher.DefaultFilterawareDispatcher;
+import org.fusesource.restygwt.client.dispatcher.FilterawareDispatcher;
+import org.fusesource.restygwt.client.event.type.Foo;
+import org.fusesource.restygwt.example.client.event.ModelChangeEvent;
 
 /**
  * @author <a href="mailto:andi.balke@gmail.com">andi</a>
@@ -67,20 +67,18 @@ public class ModelChangeAnnotationTestGwt extends GWTTestCase {
          */
         final EventBus eventBus = new SimpleEventBus();
         final QueueableCacheStorage cacheStorage = new VolatileQueueableCacheStorage();
-        final FilterawareDispatcher dispatcher = new DefaultFilterawareDispatcher();
+        FilterawareDispatcher dispatcher = new DefaultFilterawareDispatcher();
 
-        dispatcher.addFilter(new CachingDispatcherFilter(
-                cacheStorage,
-                new CallbackFactory() {
-                    public FilterawareRequestCallback createCallback(Method method) {
-                        final FilterawareRequestCallback retryingCallback = new DefaultFilterawareRequestCallback(
-                                method);
+        dispatcher.addFilter(new CachingDispatcherFilter(cacheStorage, new CallbackFactory() {
+            @Override
+            public FilterawareRequestCallback createCallback(Method method) {
+                FilterawareRequestCallback retryingCallback = new DefaultFilterawareRequestCallback(method);
 
-                        retryingCallback.addFilter(new CachingCallbackFilter(cacheStorage));
-                        retryingCallback.addFilter(new ModelChangeCallbackFilter(eventBus));
-                        return retryingCallback;
-                    }
-                }));
+                retryingCallback.addFilter(new CachingCallbackFilter(cacheStorage));
+                retryingCallback.addFilter(new ModelChangeCallbackFilter(eventBus));
+                return retryingCallback;
+            }
+        }));
 
         Defaults.setDispatcher(dispatcher);
 
@@ -133,16 +131,14 @@ public class ModelChangeAnnotationTestGwt extends GWTTestCase {
                          * check the eventhandling itself
                          * ... check it arrived our handler
                          */
-                        assertEquals(EVENTS_CATCHED_BEFORE_REQUEST + 1,
-                                handler.getAllCatchedEvents().size());
+                        assertEquals(EVENTS_CATCHED_BEFORE_REQUEST + 1, handler.getAllCatchedEvents().size());
 
                         /*
                          * prove that the last event catched is for the given domain ``Foo``
                          */
-                        assertEquals(handler.getAllCatchedEvents()
-                                .get(handler.getAllCatchedEvents().size() - 1)
-                                .getDomain(),
-                                Foo.class.getName());
+                        assertEquals(
+                            handler.getAllCatchedEvents().get(handler.getAllCatchedEvents().size() - 1).getDomain(),
+                            Foo.class.getName());
 
                         finishTest();
                     }

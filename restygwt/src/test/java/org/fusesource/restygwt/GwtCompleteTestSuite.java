@@ -18,6 +18,11 @@
 
 package org.fusesource.restygwt;
 
+import com.google.gwt.junit.tools.GWTTestSuite;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+
 import org.fusesource.restygwt.client.basic.BasicGwtJacksonTestGwt;
 import org.fusesource.restygwt.client.basic.BasicTestGwt;
 import org.fusesource.restygwt.client.basic.CacheCallbackTestGwt;
@@ -37,6 +42,7 @@ import org.fusesource.restygwt.client.basic.PathParamTestGwt;
 import org.fusesource.restygwt.client.basic.QueryParamTestGwt;
 import org.fusesource.restygwt.client.basic.ResourcePassesHeadersTestGwt;
 import org.fusesource.restygwt.client.basic.ResourceTestGwt;
+import org.fusesource.restygwt.client.basic.ResteasyGwtJacksonTestGwt;
 import org.fusesource.restygwt.client.basic.SubResourceClientGeneration;
 import org.fusesource.restygwt.client.basic.TimeoutTestGwt;
 import org.fusesource.restygwt.client.cache.VolatileQueueableCacheStorageTestGwt;
@@ -48,11 +54,6 @@ import org.fusesource.restygwt.client.codec.PolymorphicEncoderDecoderTestGwt;
 import org.fusesource.restygwt.client.complex.JsonTypeIdResolver;
 import org.fusesource.restygwt.client.complex.string.StringEncoderDecoderAutodetectPlainTextTestGwt;
 import org.fusesource.restygwt.client.complex.string.StringEncoderDecoderTestGwt;
-
-import com.google.gwt.junit.tools.GWTTestSuite;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
 
 /**
  *
@@ -69,7 +70,7 @@ import junit.framework.TestCase;
  * </ul>
  * </p>
  *
- * @author <a href="mailto:mail@raphaelbauer.com">rEyez</<a>
+ * @author <a href="mailto:mail@raphaelbauer.com">rEyez</a>
  */
 public class GwtCompleteTestSuite extends TestCase {
 
@@ -80,6 +81,7 @@ public class GwtCompleteTestSuite extends TestCase {
         GWTTestSuite suite = new GWTTestSuite("all GwtTestCases but AnnotationResolver");
 
         suite.addTestSuite(BasicGwtJacksonTestGwt.class);
+        suite.addTestSuite(ResteasyGwtJacksonTestGwt.class);
         suite.addTestSuite(BasicTestGwt.class);
         // keep the cache-callback at the beginning to get it pass
         // TODO why ? and what goes wrong when at located at the end ?

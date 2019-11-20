@@ -18,12 +18,12 @@
 
 package org.fusesource.restygwt.rebind;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.gwt.core.ext.BadPropertyValueException;
 import com.google.gwt.core.ext.GeneratorContext;
 import com.google.gwt.core.ext.TreeLogger;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * compile-time defaults
@@ -31,7 +31,9 @@ import com.google.gwt.core.ext.TreeLogger;
  * with this class it will be possible to take part of the generation process of restserviceimpl
  * classes. by default there are no additional resolvers registered, you can add some if wanted.
  *
- * @see <a href='http://code.google.com/p/google-web-toolkit/wiki/MultiValuedConfigProperties'>MultiValuedConfigProperties</a>
+ * @see
+ * <a href='http://code.google.com/p/google-web-toolkit/wiki/MultiValuedConfigProperties'>MultiValuedConfigProperties
+ * </a>
  * @author abalke
  *
  */
@@ -56,23 +58,22 @@ public class BindingDefaults {
      *
      * @return a copy of all AnnotationResolvers
      */
-    public static List<AnnotationResolver> getAnnotationResolvers(final GeneratorContext context,
-            final TreeLogger logger) {
+    public static List<AnnotationResolver> getAnnotationResolvers(GeneratorContext context,
+                                                                  TreeLogger logger) {
 
         // do this only the first time call
-        if(null == _annotationResolversRequested) {
+        if (null == _annotationResolversRequested) {
             // call additional AnnotationResolvers if there are some configured
             try {
                 for (String className : context.getPropertyOracle()
-                        .getConfigurationProperty("org.fusesource.restygwt.annotationresolver").getValues()) {
+                    .getConfigurationProperty("org.fusesource.restygwt.annotationresolver").getValues()) {
                     logger.log(TreeLogger.INFO, "classname to resolve: " + className);
-                    Class<?> clazz = null;
+                    Class<?> clazz;
 
                     try {
                         clazz = Class.forName(className);
                     } catch (ClassNotFoundException e) {
-                        new RuntimeException("could not resolve class " + className + " "
-                                + e.getMessage());
+                        throw new RuntimeException("could not resolve class " + className + " " + e.getMessage());
                     }
 
                     if (null != clazz) {
@@ -80,11 +81,9 @@ public class BindingDefaults {
                             logger.log(TreeLogger.INFO, "add annotationresolver: " + clazz.getName());
                             addAnnotationResolver((AnnotationResolver) clazz.newInstance());
                         } catch (InstantiationException e) {
-                            new RuntimeException("could not instanciate class " + className + " "
-                                    + e.getMessage());
+                            throw new RuntimeException("could not instanciate class " + className + " " + e.getMessage());
                         } catch (IllegalAccessException e) {
-                            new RuntimeException("could not access class " + className + " "
-                                    + e.getMessage());
+                            throw new RuntimeException("could not access class " + className + " " + e.getMessage());
                         }
                     } else {
                         throw new RuntimeException("could not create instance for classname " + className);
@@ -104,9 +103,7 @@ public class BindingDefaults {
         // return a copy
         List<AnnotationResolver> ret = new ArrayList<AnnotationResolver>();
 
-        for (AnnotationResolver a : annotationResolvers) {
-            ret.add(a);
-        }
+        ret.addAll(annotationResolvers);
         return _annotationResolversRequested = ret;
     }
 
@@ -116,7 +113,7 @@ public class BindingDefaults {
     public static void addAnnotationResolver(AnnotationResolver ar) {
         if (_annotationResolversRequested != null) {
             throw new RuntimeException("Sorry, you cannot add more AnnotationResolver instances after the first time " +
-                    "`BindingDefaults#getAnnotationResolvers´ has been called. please check your runtime logic.");
+                "`BindingDefaults#getAnnotationResolvers´ has been called. please check your runtime logic.");
         }
         annotationResolvers.add(ar);
     }

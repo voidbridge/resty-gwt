@@ -18,14 +18,15 @@
 
 package org.fusesource.restygwt.client.complex.string;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.json.client.JSONException;
+import com.google.gwt.junit.client.GWTTestCase;
+
+import org.fusesource.restygwt.client.FailedResponseException;
 import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.MethodCallback;
 import org.fusesource.restygwt.client.TextCallback;
 import org.fusesource.restygwt.client.complex.string.service.StringRestService;
-
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.json.client.JSONException;
-import com.google.gwt.junit.client.GWTTestCase;
 
 public class StringEncoderDecoderTestGwt extends GWTTestCase {
 
@@ -54,7 +55,8 @@ public class StringEncoderDecoderTestGwt extends GWTTestCase {
     }
 
     /**
-     * Test method only success through "onFailure" with restygwt <= 2.0.3 or plain text autodetection set to false (default)
+     * Test method only success through "onFailure" with restygwt <= 2.0.3 or plain text autodetection set to false
+     * (default)
      */
     public void testSendJsonString() {
         StringRestService strings = GWT.create(StringRestService.class);
@@ -69,7 +71,8 @@ public class StringEncoderDecoderTestGwt extends GWTTestCase {
 
             @Override
             public void onFailure(Method method, Throwable exception) {
-                if (400 == method.getResponse().getStatusCode() && "Wrong Format".equals(exception.getMessage())) {
+                if (400 == method.getResponse().getStatusCode() && exception instanceof FailedResponseException &&
+                    "Wrong Format".equals(((FailedResponseException) exception).getResponse().getText())) {
                     finishTest();
                 } else {
                     fail();
@@ -98,7 +101,8 @@ public class StringEncoderDecoderTestGwt extends GWTTestCase {
     }
 
     /**
-     * Test method only success through "onFailure" with restygwt <= 2.0.3 or plain text autodetection set to false (default)
+     * Test method only success through "onFailure" with restygwt <= 2.0.3 or plain text autodetection set to false
+     * (default)
      */
     public void testPlainTextStringWithMethodCallback() {
         StringRestService strings = GWT.create(StringRestService.class);

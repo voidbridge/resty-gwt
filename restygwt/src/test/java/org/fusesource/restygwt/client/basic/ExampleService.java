@@ -19,28 +19,29 @@
 package org.fusesource.restygwt.client.basic;
 
 import com.google.gwt.http.client.Request;
-import org.fusesource.restygwt.client.MethodCallback;
-import org.fusesource.restygwt.client.RestService;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
+import org.fusesource.restygwt.client.MethodCallback;
+import org.fusesource.restygwt.client.RestService;
+
 /**
  * Supersimple example service for testing...
  *
- * @author <a href="mailto:mail@raphaelbauer.com">rEyez</<a>
+ * @author <a href="mailto:mail@raphaelbauer.com">rEyez</a>
  */
 public interface ExampleService extends RestService {
     @GET
-    public void getExampleDto(MethodCallback<ExampleDto> callback);
+    void getExampleDto(MethodCallback<ExampleDto> callback);
 
     /**
      * Used to make sure the generator handles Request result. 
      * It can be used to cancel requests.
      */
     @GET
-    public Request getExampleDtoCancelable(MethodCallback<ExampleDto> callback);
+    Request getExampleDtoCancelable(MethodCallback<ExampleDto> callback);
 
     @POST
     @Path("/store")

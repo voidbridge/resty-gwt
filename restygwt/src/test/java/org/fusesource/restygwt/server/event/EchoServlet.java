@@ -30,7 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * servlet to reflect the incoming request
  *
- * @author <a href="mailto:andi.balke@gmail.com">andi</<a>
+ * @author <a href="mailto:andi.balke@gmail.com">andi</a>
  */
 public class EchoServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
@@ -42,32 +42,31 @@ public class EchoServlet extends HttpServlet {
     private final String RESPONSETIME_IN_SEC_HEADER_NAME = "X-Response-Time";
 
     @Override
-    protected void doPost(HttpServletRequest request,
-            HttpServletResponse response) throws IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         if (log.isLoggable(Level.FINE)) {
             log.fine("path: " + request.getPathTranslated());
-            @SuppressWarnings("unchecked")
-            Enumeration<String> headerNames = request.getHeaderNames();
+            @SuppressWarnings("unchecked") Enumeration<String> headerNames = request.getHeaderNames();
             StringBuilder sb = new StringBuilder();
             sb.append("\n");
             sb.append("URI    : ").append(request.getRequestURI()).append("\n");
             sb.append("Method : ").append(request.getMethod()).append("\n");
             sb.append("Headers:\n");
             sb.append("========\n");
-            while(headerNames.hasMoreElements()) {
-                final String s = headerNames.nextElement();
+            while (headerNames.hasMoreElements()) {
+                String s = headerNames.nextElement();
                 sb.append("  ").append(s).append(": ").append(request.getHeader(s)).append("\n");
             }
             sb.append("========\n");
 
             sb.append("Body   :\n");
             sb.append("========\n");
-            String line = null;
+            String line;
             do {
                 line = request.getReader().readLine();
-                if (null != line)
+                if (null != line) {
                     sb.append(line).append("\n");
-            } while(null != line);
+                }
+            } while (null != line);
             sb.append("========\n");
             log.fine(sb.toString());
         }
@@ -90,8 +89,7 @@ public class EchoServlet extends HttpServlet {
         // wait if necessary
         if (null != request.getHeader(RESPONSETIME_IN_SEC_HEADER_NAME)) {
             try {
-                final int waitingTime =
-                    Integer.parseInt(request.getHeader(RESPONSETIME_IN_SEC_HEADER_NAME)) * 1000;
+                int waitingTime = Integer.parseInt(request.getHeader(RESPONSETIME_IN_SEC_HEADER_NAME)) * 1000;
                 log.fine("need to wait for: " + waitingTime + " milliseconds");
                 Thread.sleep(waitingTime);
             } catch (InterruptedException e) {
@@ -102,20 +100,17 @@ public class EchoServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest request,
-            HttpServletResponse response) throws IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         doPost(request, response);
     }
 
     @Override
-    protected void doDelete(HttpServletRequest request,
-            HttpServletResponse response) throws IOException {
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
         doPost(request, response);
     }
 
     @Override
-    protected void doPut(HttpServletRequest request,
-            HttpServletResponse response) throws IOException {
+    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
         doPost(request, response);
     }
 }

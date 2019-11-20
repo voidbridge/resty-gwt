@@ -15,11 +15,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.fusesource.restygwt.rebind.util;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
+
+import javax.ws.rs.Path;
 
 /**
  * An utility class that gets a String representation of an annotation.
@@ -38,8 +41,7 @@ public class AnnotationCopyUtil {
     }
 
     private static StringBuilder encodeAnnotationName(Annotation annotation) {
-        return new StringBuilder( "@" )
-                .append(annotation.annotationType().getCanonicalName());
+        return new StringBuilder("@").append(annotation.annotationType().getCanonicalName());
     }
 
     private static boolean hasAnnotationAttributes(Annotation annotation) {
@@ -56,15 +58,12 @@ public class AnnotationCopyUtil {
             String encodedValue = encodeAnnotationValue(value);
 
             // Strip regex expressions from Path annotation value
-            if (javax.ws.rs.Path.class == annotation.annotationType()) {
+            if (Path.class == annotation.annotationType()) {
                 encodedValue = encodedValue.replaceAll("\\{\\s*(\\S+)\\s*:\\s*[^{}]+\\}", "{$1}");
             }
 
-            if(encodedValue != null) {
-                result.append( comma.next() )
-                      .append( method.getName() )
-                      .append( " = " )
-                      .append( encodedValue );
+            if (encodedValue != null) {
+                result.append(comma.next()).append(method.getName()).append(" = ").append(encodedValue);
             }
         }
 
@@ -75,20 +74,20 @@ public class AnnotationCopyUtil {
         try {
             return annotationAttribute.invoke(annotation);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Unable to read attribute " + annotationAttribute + " from " + annotation, e);
+            throw new IllegalArgumentException(
+                "Unable to read attribute " + annotationAttribute + " from " + annotation, e);
         }
     }
 
     /**
      * Returns the string representation of {@code value} or {@code null}, if the element should not be added.
-     * 
+     *
      * @param value
-     * @return 
-     * @throws IllegalArgumentException Wrong value type
+     * @return
      */
     private static String encodeAnnotationValue(Object value) {
         // Values of annotation elements must not be "null"
-        if(null != value) {
+        if (null != value) {
             if (value instanceof String) {
                 return readStringValue(value);
             } else if (value instanceof Number) {
@@ -96,7 +95,7 @@ public class AnnotationCopyUtil {
             } else if (value.getClass().isArray()) {
                 // workaround for ClassCastException: [Ljava.lang.Object; cannot be cast to [I
                 // ignore empty arrays, because it becomes Object[]
-                if(Array.getLength(value) > 0) {
+                if (Array.getLength(value) > 0) {
                     return readArrayValue(value);
                 }
                 return null;
@@ -124,8 +123,7 @@ public class AnnotationCopyUtil {
         for (int i = 0; i < Array.getLength(value); i++) {
             Object arrayValue = Array.get(value, i);
 
-            result.append(comma.next())
-                  .append(encodeAnnotationValue(arrayValue));
+            result.append(comma.next()).append(encodeAnnotationValue(arrayValue));
         }
         result.append("}");
 
